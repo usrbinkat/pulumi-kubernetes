@@ -1,0 +1,12 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  disableDefaultCNI: true   # do not install kindnet
+  kubeProxyMode: none       # do not run kube-proxy
+  podSubnet: "10.242.0.0/16"
+  serviceSubnet: "10.12.0.0/16"
+name: kindiac
+nodes:
+- role: control-plane
+- role: worker
+- role: worker

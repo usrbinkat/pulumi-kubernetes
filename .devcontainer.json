@@ -69,6 +69,8 @@
   },
   "features": {
     "ghcr.io/devcontainers-contrib/features/kind:1": {},
+    "ghcr.io/devcontainers-contrib/features/istioctl:1": {},
+    "ghcr.io/audacioustux/devcontainers/cilium:1": {},
     "ghcr.io/devcontainers/features/common-utils:2": {
         "username": "vscode",
         "userGid": "automatic",
@@ -88,4 +90,3 @@
   "forwardPorts": [1313, 2222, 6000, 7681, 8080],
   "runArgs": ["--network=host"]
 }
-
