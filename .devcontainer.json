@@ -60,6 +60,7 @@
         "ms-vsliveshare.vsliveshare",
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
+        "ms-vscode.vscode-typescript-next",
         "github.vscode-pull-request-github",
         "ms-vscode-remote.remote-containers",
         "visualstudioexptteam.vscodeintellicode",

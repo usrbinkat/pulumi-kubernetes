@@ -1,0 +1,3 @@
+name: pulumi-cilium-system
+runtime: nodejs
+description: pulumi deploy cilium on kubernetes
