@@ -68,6 +68,7 @@
     }
   },
   "features": {
+    "ghcr.io/devcontainers-contrib/features/kind:1": {},
     "ghcr.io/devcontainers/features/common-utils:2": {
         "username": "vscode",
         "userGid": "automatic",
