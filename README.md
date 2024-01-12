@@ -27,14 +27,8 @@ iac-mesh-pac on  main [!?]
 # Create Kind Cluster
 kind create --config hack/kind.yaml
 
-# Install cilium
-cilium install --wait --wait-duration 2m0s
-
-# Check for all running containers
-kubectl get po -A -owide
-
 # Add cilium helm repo
-helm repo add cilium https://helm.cilium.io/
+helm repo add cilium https://helm.cilium.io
 
 # Deploy cilium
 helm upgrade --install cilium cilium/cilium --namespace kube-system --version 1.14.5 --values hack/cilium.yaml
