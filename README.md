@@ -28,15 +28,14 @@ iac-mesh-pac on  main [!?]
 kind create --config hack/kind.yaml
 
 # Add cilium helm repo
-helm repo add cilium https://helm.cilium.io
-
 # Deploy cilium
+helm repo add cilium https://helm.cilium.io
 helm upgrade --install cilium cilium/cilium --namespace kube-system --version 1.14.5 --values hack/cilium.yaml
 
 # cilium status
 cilium status --wait --wait-duration 2m0s
 
-# Stop at #2
+# Starwars Empire vs Rebels Demo App
 # https://docs.solo.io/gloo-network/main/quickstart/#policy
 
 export CILIUM_VERSION=1.14.5
