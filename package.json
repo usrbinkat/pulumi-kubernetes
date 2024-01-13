@@ -1,0 +1,13 @@
+{
+  "name": "pulumi-cilium-system",
+  "description": "pulumi deploy cilium on kubernetes",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "@pulumi/pulumi": "^3.0.0",
+    "@pulumi/kubernetes": "4.4.0"
+  }
+}
