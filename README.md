@@ -21,6 +21,11 @@ kind create --config hack/kind.yaml
 
 # Login to Pulumi Cloud
 pulumi login
+
+# Install npm dependencies
+pulumi install
+
+# Create Stack
 pulumi up
 ```
 
