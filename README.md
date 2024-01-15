@@ -32,8 +32,8 @@ pulumi up
 ## Repo Tree
 
 ```bash
-iac-mesh-pac on <> main [!?]
-🐋❯ tree -a -I .git -I .devcontainer
+iac-mesh-pac on <> main via <> v20.11.0 via <> usrbinkat@iac-mesh-pac
+🐋❯ tree -a -I .git -I .devcontainer -I node_modules
 .
 ├── README.md                   # Overview and docs for the project
 ├── LICENSE                     # Project license file
