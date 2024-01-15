@@ -20,20 +20,21 @@ const ciliumHelmValues = {
     routingMode: "tunnel",
     k8sServicePort: 6443,
     tunnelProtocol: "vxlan",
-    k8sServiceHost: "172.18.0.2",
+//  k8sServiceHost: "172.18.0.3",
     kubeProxyReplacement: "strict",
     nativeRoutingCIDR: "10.2.0.0/16",
     image: { pullPolicy: "IfNotPresent" },
     hostServices: { enabled: false },
     cluster: { name: "kind-cilium" },
     externalIPs: { enabled: true },
+    gatewayAPI: { enabled: true },
     ipam: { mode: "kubernetes" },
     nodePort: { enabled: true },
     hostPort: { enabled: true },
     operator: { replicas: 1 },
     serviceAccounts: {
-        cilium: { create: true, name: "cilium" },
-        operator: { create: true, name: "cilium-operator" },
+        cilium: { name: "cilium" },
+        operator: { name: "cilium-operator" },
     },
 };
 
@@ -48,7 +49,6 @@ const ciliumHelmRelease = new k8s.helm.v3.Release("cilium-release", {
     waitForJobs: true,
     skipAwait: false,
     skipCrds: false,
-    //verify: true,
     lint: true,
 }, { provider: k8sProvider });
 

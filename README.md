@@ -11,6 +11,11 @@ This repo is a Pulumi IaC implementation of the [Cilium Network Policy](https://
 ## How To
 
 ```bash
+# Docker Volumes
+docker volume create cilium-worker-n01
+docker volume create cilium-worker-n02
+docker volume create cilium-control-plane-n01
+
 # Create Kind Cluster
 kind create --config hack/kind.yaml
 
