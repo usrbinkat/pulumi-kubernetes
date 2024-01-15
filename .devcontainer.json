@@ -83,10 +83,12 @@
     //    "version": "latest",
     //    "moby": false
     //}
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    //"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
-  "postCreateCommand": "git submodule update --init --recursive; direnv allow",
   "remoteUser": "vscode",
   "forwardPorts": [1313, 2222, 6000, 7681, 8080],
-  "runArgs": ["--network=host"]
+  "postCreateCommand": "git submodule update --init --recursive; direnv allow",
+  "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
+  "runArgs": ["--init", "--privileged", "--network=host"],
+  "overrideCommand": false
 }
