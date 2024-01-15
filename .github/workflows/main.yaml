@@ -24,12 +24,7 @@ jobs:
         container:
             #image: ghcr.io/pulumi/devcontainer:latest
             image: ghcr.io/containercraft/konductor:latest
-            options: |
-                --user vscode \
-                --env-file .env \
-                --privileged \
-                --cpus 4 \
-                --memory 8g \
+            options: --user vscode --env-file .env --privileged --cpus 4 --memory 8g
 
         permissions:
             actions: write
