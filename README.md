@@ -44,7 +44,7 @@ iac-mesh-pac on <> main via <> v20.11.0 via <> usrbinkat@iac-mesh-pac
 │
 ├── Pulumi.yaml                 # Pulumi project config
 ├── index.ts                    # Pulumi TypeScript IaC program
-└── tsconfig.json               # TypeScript config file
+├── tsconfig.json               # TypeScript config file
 ├── package-lock.json           # NPM package lock file
 ├── package.json                # NPM package config file
 │
