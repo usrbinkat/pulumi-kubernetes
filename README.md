@@ -11,7 +11,7 @@ This repo is a Pulumi IaC implementation of the [Cilium Network Policy](https://
 ## How To
 
 ```bash
-# Docker Volumes
+# Create Docker Volumes
 docker volume create cilium-worker-n01
 docker volume create cilium-worker-n02
 docker volume create cilium-control-plane-n01
@@ -19,13 +19,13 @@ docker volume create cilium-control-plane-n01
 # Create Kind Cluster
 kind create --config hack/kind.yaml
 
-# Login to Pulumi Cloud
+# Pulumi Cloud Login
 pulumi login
 
-# Install npm dependencies
+# Grab NPM dependencies
 pulumi install
 
-# Create Stack
+# Pulumi Deploy Stack
 pulumi up
 ```
 
@@ -35,26 +35,33 @@ pulumi up
 iac-mesh-pac on <> main [!?]
 🐋❯ tree -a -I .git -I .devcontainer
 .
-├── README.md              # Overview and docs for the project
-├── LICENSE                # Project license file
-├── .devcontainer.json     # VSCode Dev Container config
-├── .gitmodules            # Git Submodule config
-├── .gitignore             # Lists files Git should ignore
-├── .envrc                 # Direnv shell script for environment variables
+├── README.md                   # Overview and docs for the project
+├── LICENSE                     # Project license file
+├── .devcontainer.json          # VSCode Dev Container config
+├── .gitmodules                 # Git Submodule config
+├── .gitignore                  # Lists files Git should ignore
+├── .envrc                      # Direnv shell script for environment variables
 │
-├── hack                   # Utility scripts and configs
-│   ├── kind.yaml          # KinD cluster configuration
-│   ├── cilium.yaml        # Cilium helm chart values
-│   └── ciliumnetpol.yaml  # Cilium network policies
+├── Pulumi.yaml                 # Pulumi project config
+├── index.ts                    # Pulumi TypeScript IaC program
+└── tsconfig.json               # TypeScript config file
+├── package-lock.json           # NPM package lock file
+├── package.json                # NPM package config file
 │
-└── .kube                  # Kubernetes config directory
-    ├── config             # Kubernetes credentials file (gitignored)
-    └── .gitkeep           # Keeps .kube in version control when empty
+├── hack                        # Utility scripts and configs
+│   ├── kind.yaml               # KinD cluster configuration
+│   ├── cilium.yaml             # Cilium helm chart values
+│   ├── ciliumnetpol.yaml       # Cilium network policies
+│   └── cilium.helm.values.yaml # Cilium helm chart reference default values
+│
+└── .kube                       # Kubernetes config directory
+    ├── config                  # Kubernetes credentials file (gitignored)
+    └── .gitkeep                # Keeps .kube in version control when empty
 
-2 directories, 11 files
+2 directories, 16 files
 ```
 
-## Alternative manual steps:
+## Alternative manual steps
 
 <details>
 
