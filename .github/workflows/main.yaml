@@ -34,12 +34,12 @@ jobs:
         steps:
         -
             name: Run shell script
-            run: pwd; ls -lah; whoami; groups
+            run: set -ex; pwd; git status || true; ls -lah; whoami; groups
         -
             uses: actions/checkout@v2
         -
             name: Run shell script
-            run: pwd; ls -lah; whoami; groups
+            run: set -ex; pwd; git status || true; ls -lah; whoami; groups
 
         -
             name: Git Checkout
