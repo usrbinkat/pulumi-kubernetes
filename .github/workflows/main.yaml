@@ -24,7 +24,7 @@ jobs:
         container:
             #image: ghcr.io/pulumi/devcontainer:latest
             image: ghcr.io/containercraft/konductor:latest
-            options: --user vscode --env-file .env --privileged --cpus 4 --memory 8g
+            options: --user vscode --privileged --cpus 4 --memory 8g
 
         permissions:
             actions: write
@@ -43,6 +43,7 @@ jobs:
             id: kind-create-cluster-cilium
             run: |
                 set -ex
+                direnv allow
                 sudo docker volume ls
                 sudo docker volume create cilium-control-plane-n01
                 sudo docker volume create cilium-worker-n01
@@ -68,6 +69,7 @@ jobs:
             id: pulumi-up
             run: |
                 set -ex
+                direnv allow
                 pwd
                 sudo kind get kubeconfig --name cilium > .kube/config
                 pulumi login --local
@@ -85,6 +87,7 @@ jobs:
             id: cilium-status
             run: |
                 set -ex
+                direnv allow
                 pwd
                 sudo kind get kubeconfig --name cilium > .kube/config
                 kubectl --kubeconfig .kube/config get po -owide -A
@@ -96,6 +99,7 @@ jobs:
             name: Cleanup
             run: |
                 set -ex
+                direnv allow
                 sudo kind delete cluster --name cilium
                 sudo docker volume ls
                 #sudo docker volume rm cilium-control-plane-n01
