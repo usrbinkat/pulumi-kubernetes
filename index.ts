@@ -1,11 +1,17 @@
+// Main Pulumi Typescript Program
 import * as pulumi from "@pulumi/pulumi";
+
+// Import the Pulumi Kubernetes Typescript Provider Package
+// https://www.pulumi.com/registry/packages/kubernetes/
 import * as k8s from '@pulumi/kubernetes';
 
 // Load the Pulumi Config
+// This configuration imports config settings from the local Pulumi.$STACK.yaml file and Pulumi ESC sources
 const config = new pulumi.Config();
 
 // Get the kubeconfig context from the Pulumi configuration
 // If none is specified, use the default "kind-cilium" context
+// - pulumi config set kubeconfig.context $KUBECONFIG_CONTEXT_NAME
 const context = config.get("kubeconfig.context") || "kind-cilium";
 
 // Create a Kubernetes provider instance that uses the context from the local kubeconfig file.
@@ -14,13 +20,21 @@ const k8sProvider = new k8s.Provider("k8sProvider", {
     context: context,
 });
 
+// Fetch the Kubernetes endpoint for "kubernetes"
+const kubernetesEndpoint = k8s.core.v1.Endpoints.get("kubernetes-endpoint", "kubernetes", { provider: k8sProvider });
+
+// Export the IP addresses
+export const serverIPs = kubernetesEndpoint.subsets.apply(subsets =>
+    subsets.map(subset => subset.addresses.map(address => address.ip)).flat()
+);
+
 // Cilium Helm Chart Values
 const ciliumHelmValues = {
     namespace: "kube-system",
     routingMode: "tunnel",
     k8sServicePort: 6443,
     tunnelProtocol: "vxlan",
-    k8sServiceHost: "172.18.0.3",
+    k8sServiceHost: serverIPs[0],
     kubeProxyReplacement: "strict",
     nativeRoutingCIDR: "10.2.0.0/16",
     image: { pullPolicy: "IfNotPresent" },
@@ -41,7 +55,7 @@ const ciliumHelmValues = {
 // Deploy Helm Chart for Cilium
 const ciliumHelmRelease = new k8s.helm.v3.Release("cilium-release", {
     chart: "cilium",
-    name: "cilium",
+    name: "cilium", // This is the name of the Helm Release and is an arbitrary string
     repositoryOpts: {repo: "https://helm.cilium.io/"},
     version: "1.14.5",
     values: ciliumHelmValues,
@@ -53,6 +67,8 @@ const ciliumHelmRelease = new k8s.helm.v3.Release("cilium-release", {
 }, { provider: k8sProvider });
 
 // Fetch the Cilium Operator Deployment after the Helm release has been deployed
+// This is the equivalent of returning the output from the following Kubectl command or using `cilium status`:
+// - kubectl -n kube-system get deployment cilium-operator -ojsonpath={.status.conditions[0].type}
 const ciliumOperatorDeployment = pulumi.all([ciliumHelmRelease.status]).apply(([status]) => {
     return k8s.apps.v1.Deployment.get("cilium-operator-deployment", pulumi.interpolate`${status.namespace}/cilium-operator`, {
         provider: k8sProvider,
