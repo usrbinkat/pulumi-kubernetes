@@ -22,16 +22,15 @@ jobs:
     build:
         runs-on: ubuntu-latest
         container:
+            #image: ghcr.io/pulumi/devcontainer:latest
             image: ghcr.io/containercraft/konductor:latest
-#           volumes:
-#               - /run/docker.sock:/run/docker.sock
             options: |
                 --user vscode \
                 --env-file .env \
                 --privileged \
                 --cpus 4 \
-                --memory 8g \
-                --mount type=bind,source=/run/docker.sock,target=/run/docker.sock
+                --memory 8g
+#               --mount type=bind,source=/run/docker.sock,target=/var/run/docker.sock
 
         permissions:
             actions: write
@@ -46,32 +45,69 @@ jobs:
             id: git
 
         -
-            name: Provision KinD Cluster
-            uses: helm/kind-action@v1.8.0
-            with:
-                config: hack/kind.ci.yaml
-                wait: true
+            name: Create Kind Cluster
+            id: kind-create-cluster-cilium
+            run: |
+                set -ex
+                sudo docker volume ls
+                sudo docker volume create cilium-control-plane-n01
+                sudo docker volume create cilium-worker-n01
+                sudo docker volume create cilium-worker-n02
+                sudo docker volume ls
+                sudo kind delete cluster --name cilium
+                sleep 5;
+                sudo kind create cluster --name cilium --config hack/kind.yaml --wait 1m
+                sudo kind get kubeconfig --name cilium > .kube/config
+                sleep 30; kubectl --kubeconfig .kube/config get po -owide -A
+
+#       -
+#           name: Provision KinD Cluster
+#           uses: helm/kind-action@v1.8.0
+#           with:
+#               config: hack/kind.yaml
+#               install_only: true
+#               cluster_name: cilium
+#               wait: true
 
         -
             name: Pulumi Setup
+            id: pulumi-up
             run: |
+                set -ex
+                pwd
+                sudo kind get kubeconfig --name cilium > .kube/config
                 pulumi login --local
                 pulumi stack init iac-mesh-pac
+                pulumi stack select iac-mesh-pac
+                pulumi install
+                pulumi up --yes --skip-preview
+                sleep 30
+                kubectl --kubeconfig .kube/config get po -owide -A
+                sleep 30
+                kubectl --kubeconfig .kube/config get po -owide -A
 
-#       -
-#           name: Create Docker Volumes
-#           run: |
-#               set -ex
-#               docker volume ls
-#               docker volume create cilium-control-plane-n01
-#               docker volume create cilium-worker-n01
-#               docker volume create cilium-worker-n02
+        -
+            name: Cilium Status
+            id: cilium-status
+            run: |
+                set -ex
+                pwd
+                sudo kind get kubeconfig --name cilium > .kube/config
+                kubectl --kubeconfig .kube/config get po -owide -A
+                cilium status --wait --wait-duration 3m
+                sleep 30
+                kubectl --kubeconfig .kube/config get po -owide -A
 
-#       -
-#           name: Pulumi Login
-#           uses: pulumi/actions-login@v1
-#           with:
-#               pulumi-access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        -
+            name: Cleanup
+            run: |
+                set -ex
+                sudo kind delete cluster --name cilium
+                sudo docker volume ls
+                #sudo docker volume rm cilium-control-plane-n01
+                #sudo docker volume rm cilium-worker-n01
+                #sudo docker volume rm cilium-worker-n02
+                #sudo docker volume ls
 
 #       -
 #           name: Pulumi Preview
@@ -88,5 +124,5 @@ jobs:
 #           with:
 #               stack: iac-mesh-pac
 #               command: up
-#               args: --yes
+#               args: --yes --skip-preview
 #               workdir: pulumi

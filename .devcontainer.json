@@ -41,8 +41,9 @@
         "editor.gotoLocation.multipleImplementations": "goto",
         "editor.gotoLocation.multipleTypeDefinitions": "goto",
         "editor.terminal.integrated.shell.linux": "/usr/bin/fish",
-        "terminal.integrated.sendKeybindingsToShell": true,
         "terminal.integrated.fontFamily": "FiraMono Nerd Font Mono",
+        "terminal.integrated.shell.linux": "/usr/bin/fish",
+        "terminal.integrated.sendKeybindingsToShell": true,
         "workbench.colorTheme": "Dracula Soft",
         "explorer.openEditors.visible": 1,
         "files.trimTrailingWhitespace": true,
@@ -69,22 +70,20 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers-contrib/features/kind:1": {},
-    "ghcr.io/devcontainers-contrib/features/istioctl:1": {},
-    "ghcr.io/audacioustux/devcontainers/cilium:1": {},
-    "ghcr.io/devcontainers/features/common-utils:2": {
-        "username": "vscode",
-        "userGid": "automatic",
-        "userUid": "automatic",
-        "upgradePackages": false,
-        "nonFreePackages": true
-    },
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-        "installDockerBuildx": true,
-        "dockerDashComposeVersion": "v2",
-        "version": "latest",
-        "moby": false
-    }
+    //"ghcr.io/devcontainers/features/common-utils:2": {
+    //    "username": "vscode",
+    //    "userGid": "automatic",
+    //    "userUid": "automatic",
+    //    "upgradePackages": false,
+    //    "nonFreePackages": false
+    //},
+    //"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+    //    "installDockerBuildx": false,
+    //    "dockerDashComposeVersion": "v2",
+    //    "version": "latest",
+    //    "moby": false
+    //}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "postCreateCommand": "git submodule update --init --recursive; direnv allow",
   "remoteUser": "vscode",

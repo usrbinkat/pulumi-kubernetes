@@ -136,6 +136,9 @@ kubectl get pods -n starwars --show-labels
 # Install Github Actions `act` CLI for local GHA testing
 # This allows for running most github actions workflows locally to test changes
 gh extension install https://github.com/nektos/gh-act
+
+# Run Github Actions locally
+gh act --env-file .env -s GITHUB_TOKEN=$GITHUB_TOKEN -s PULUMI_ACCESS_TOKEN=$PULUMI_ACCESS_TOKEN
 ```
 
 </details>

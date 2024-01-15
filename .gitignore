@@ -2,3 +2,5 @@
 /bin/
 /node_modules/
 .kube/config
+.pulumi
+.pulumi/*
