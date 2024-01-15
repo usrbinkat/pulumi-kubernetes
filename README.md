@@ -17,7 +17,7 @@ docker volume create cilium-worker-n02
 docker volume create cilium-control-plane-n01
 
 # Create Kind Cluster
-kind create --config hack/kind.yaml
+kind create cluster --config hack/kind.yaml
 
 # Pulumi Cloud Login
 pulumi login
@@ -27,6 +27,7 @@ pulumi install
 
 # Pulumi Deploy Stack
 pulumi stack init iac-mesh-pac
+pulumi stack select iac-mesh-pac
 pulumi up
 ```
 
