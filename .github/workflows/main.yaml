@@ -32,6 +32,14 @@ jobs:
             contents: read
 
         steps:
+        -
+            name: Run shell script
+            run: pwd; ls -lah; whoami; groups
+        -
+            uses: actions/checkout@v2
+        -
+            name: Run shell script
+            run: pwd; ls -lah; whoami; groups
 
         -
             name: Git Checkout
