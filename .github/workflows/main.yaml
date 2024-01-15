@@ -29,8 +29,7 @@ jobs:
                 --env-file .env \
                 --privileged \
                 --cpus 4 \
-                --memory 8g
-#               --mount type=bind,source=/run/docker.sock,target=/var/run/docker.sock
+                --memory 8g \
 
         permissions:
             actions: write
