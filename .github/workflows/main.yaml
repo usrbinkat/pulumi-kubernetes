@@ -1,0 +1,92 @@
+name: CI Test Workflow
+on:
+    workflow_dispatch:
+    push:
+        branches:
+        - main
+        paths-ignore:
+        - '.devcontainer/**'
+        - '.vscode/**'
+        - '**.md'
+    pull_request:
+        branches:
+        - main
+        paths-ignore:
+        - '.devcontainer/**'
+        - '.vscode/**'
+        - '**.md'
+    schedule:
+        - cron: '0 0 * * 0'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/containercraft/konductor:latest
+#           volumes:
+#               - /run/docker.sock:/run/docker.sock
+            options: |
+                --user vscode \
+                --env-file .env \
+                --privileged \
+                --cpus 4 \
+                --memory 8g \
+                --mount type=bind,source=/run/docker.sock,target=/run/docker.sock
+
+        permissions:
+            actions: write
+            packages: write
+            contents: read
+
+        steps:
+
+        -
+            name: Git Checkout
+            uses: actions/checkout@v4
+            id: git
+
+        -
+            name: Provision KinD Cluster
+            uses: helm/kind-action@v1.8.0
+            with:
+                config: hack/kind.ci.yaml
+                wait: true
+
+        -
+            name: Pulumi Setup
+            run: |
+                pulumi login --local
+                pulumi stack init iac-mesh-pac
+
+#       -
+#           name: Create Docker Volumes
+#           run: |
+#               set -ex
+#               docker volume ls
+#               docker volume create cilium-control-plane-n01
+#               docker volume create cilium-worker-n01
+#               docker volume create cilium-worker-n02
+
+#       -
+#           name: Pulumi Login
+#           uses: pulumi/actions-login@v1
+#           with:
+#               pulumi-access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+#       -
+#           name: Pulumi Preview
+#           uses: pulumi/actions-preview@v1
+#           with:
+#               stack: iac-mesh-pac
+#               command: up
+#               args: --yes
+#               workdir: pulumi
+
+#       -
+#           name: Pulumi Update
+#           uses: pulumi/actions-update@v1
+#           with:
+#               stack: iac-mesh-pac
+#               command: up
+#               args: --yes
+#               workdir: pulumi

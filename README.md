@@ -26,6 +26,7 @@ pulumi login
 pulumi install
 
 # Pulumi Deploy Stack
+pulumi stack init iac-mesh-pac
 pulumi up
 ```
 
@@ -37,16 +38,17 @@ iac-mesh-pac on <> main via <> v20.11.0 via <> usrbinkat@iac-mesh-pac
 .
 ├── README.md                   # Overview and docs for the project
 ├── LICENSE                     # Project license file
-├── .devcontainer.json          # VSCode Dev Container config
-├── .gitmodules                 # Git Submodule config
-├── .gitignore                  # Lists files Git should ignore
-├── .envrc                      # Direnv shell script for environment variables
 │
 ├── Pulumi.yaml                 # Pulumi project config
 ├── index.ts                    # Pulumi TypeScript IaC program
 ├── tsconfig.json               # TypeScript config file
 ├── package-lock.json           # NPM package lock file
 ├── package.json                # NPM package config file
+│
+├── .devcontainer.json          # VSCode Dev Container config
+├── .gitmodules                 # Git Submodule config
+├── .gitignore                  # Lists files Git should ignore
+├── .envrc                      # Direnv shell script for environment variables
 │
 ├── hack                        # Utility scripts and configs
 │   ├── kind.yaml               # KinD cluster configuration
@@ -59,6 +61,27 @@ iac-mesh-pac on <> main via <> v20.11.0 via <> usrbinkat@iac-mesh-pac
     └── .gitkeep                # Keeps .kube in version control when empty
 
 2 directories, 16 files
+```
+
+### Cleanup
+
+```bash
+# Pulumi Destroy Stack
+pulumi down
+
+# Delete Pulumi Stack
+pulumi stack rm iac-mesh-pac
+
+# Delete Kind Cluster
+kind delete cluster --name iac-mesh-pac
+
+# Delete Docker Volumes
+docker volume rm cilium-worker-n01
+docker volume rm cilium-worker-n02
+docker volume rm cilium-control-plane-n01
+
+# Delete Github Codespace
+gh codespace delete --codespace ${CODESPACE_NAME}
 ```
 
 ## Alternative manual steps
@@ -99,6 +122,20 @@ kubectl exec xwing -n starwars -- curl -s -XPOST deathstar.starwars.svc.cluster.
 
 # check labels
 kubectl get pods -n starwars --show-labels
+```
+
+</details>
+
+## Maintainers / Contributors
+
+<details>
+
+```bash
+#
+
+# Install Github Actions `act` CLI for local GHA testing
+# This allows for running most github actions workflows locally to test changes
+gh extension install https://github.com/nektos/gh-act
 ```
 
 </details>
