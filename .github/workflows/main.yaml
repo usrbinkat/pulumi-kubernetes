@@ -47,6 +47,7 @@ jobs:
         echo "GID=$(echo ${{ steps.set_vars.outputs.gid }})" | tee -a ${GITHUB_ENV}
         echo "whoami = $(whoami)"
         echo "groups = $(groups)"
+        source ${GITHUB_ENV}
         echo "UID=$UID"
         echo "GID=$GID"
 
@@ -62,7 +63,11 @@ jobs:
     steps:
 
     - name: "Set User:Group Ownership"
-      run: set -ex; sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+      run: |
+        set -ex;\
+        echo "$(whoami) ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/$(whoami);\
+        sudo chown -R $USER:$USER $GITHUB_WORKSPACE;\
+        echo
 
     - name: dbg1
       id: dbg1
