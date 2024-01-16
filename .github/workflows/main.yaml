@@ -52,14 +52,15 @@ jobs:
 
   configure:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/containercraft/konductor:latest
-      options: --user ${{ needs.setup.outputs.uid }}:${{ needs.setup.outputs.gid }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
-
     defaults:
       run:
         shell: bash
+    container:
+      image: ghcr.io/containercraft/konductor:latest
+      options: --user 1001:127 --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+#     options: --user ${{ needs.setup.outputs.uid }}:${{ steps.set_vars.outputs.gid }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
     steps:
+
     - name: "Set User:Group Ownership"
       run: set -ex; sudo chown -R $USER:$USER $GITHUB_WORKSPACE
 
