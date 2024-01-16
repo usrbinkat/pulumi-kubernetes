@@ -59,9 +59,10 @@ jobs:
                 sudo docker volume ls
                 sudo kind delete cluster --name cilium
                 sleep 5;
-                sudo kind create cluster --name cilium --config hack/kind.yaml --wait 1m
-                sudo kind get kubeconfig --name cilium > .kube/config
-                sleep 30; kubectl --kubeconfig .kube/config get po -owide -A
+                sudo kind create cluster --name cilium --config hack/kind.yaml --wait 1m || true
+                sudo kind get kubeconfig --name cilium > $KUBECONFIG
+                sleep 30;
+                kubectl --kubeconfig .kube/config get po -owide -A
 
 #       -
 #           name: Provision KinD Cluster
@@ -79,7 +80,7 @@ jobs:
                 set -ex
                 direnv allow
                 pwd
-                sudo kind get kubeconfig --name cilium > .kube/config
+                sudo kind get kubeconfig --name cilium > $KUBECONFIG
                 pulumi login --local
                 pulumi stack init iac-mesh-pac
                 pulumi stack select iac-mesh-pac
