@@ -83,118 +83,118 @@ jobs:
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo "-----------------------------------";\
 
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      packages: write
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    env:
-      WORKSPACE: ${{ github.workspace }}
-    container:
-      image: ghcr.io/containercraft/konductor:latest
-      options: --user ${{ env.UID }}:${{ env.GID }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+# build:
+#   runs-on: ubuntu-latest
+#   permissions:
+#     actions: write
+#     packages: write
+#     contents: read
+#   defaults:
+#     run:
+#       shell: bash
+#   env:
+#     WORKSPACE: ${{ github.workspace }}
+#   container:
+#     image: ghcr.io/containercraft/konductor:latest
+#     options: --user ${{ env.UID }}:${{ env.GID }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
 
-    steps:
+#   steps:
 
-    - name: Ammend Environment Variables
-      id: environment
-      run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
+#   - name: Ammend Environment Variables
+#     id: environment
+#     run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
 
-    - name: Git Checkout
-      uses: actions/checkout@v4
-      with:
-        # Add repository path as safe.directory for Git global config by running `git
-        # config --global --add safe.directory <path>`
-        repository: ${{ github.repository }}
-        set-safe-directory: 'true'
-        fetch-depth: '1'
-        submodules: 'recursive'
-        fetch-tags: 'true'
-        clean: 'true'
-        path: ${{ github.workspace }}
+#   - name: Git Checkout
+#     uses: actions/checkout@v4
+#     with:
+#       # Add repository path as safe.directory for Git global config by running `git
+#       # config --global --add safe.directory <path>`
+#       repository: ${{ github.repository }}
+#       set-safe-directory: 'true'
+#       fetch-depth: '1'
+#       submodules: 'recursive'
+#       fetch-tags: 'true'
+#       clean: 'true'
+#       path: ${{ github.workspace }}
 
-    - name: dbg2
-      id: dbg2
-      run: |
-        echo "-----------------------------------";\
-        echo;\
-        echo dbg2.0
-        git status || true;\
-        echo "whoami = $(whoami)";\
-        echo "groups = $(groups)";\
-        echo "[user_id:group] [$(id -u):$(id -g)]";\
-        cat /etc/passwd | grep $(whoami);\
-        sudo tree -a $WORKSPACE || true;\
-        echo;
-        echo "-----------------------------------";\
-        echo;\
-        echo dbg2.1;\
-        pwd;\
-        echo;\
-        ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
-        tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
-        echo dbg2.2
-        cd $WORKSPACE;\
-        pwd;\
-        echo;\
-        ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
-        tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
+#   - name: dbg2
+#     id: dbg2
+#     run: |
+#       echo "-----------------------------------";\
+#       echo;\
+#       echo dbg2.0
+#       git status || true;\
+#       echo "whoami = $(whoami)";\
+#       echo "groups = $(groups)";\
+#       echo "[user_id:group] [$(id -u):$(id -g)]";\
+#       cat /etc/passwd | grep $(whoami);\
+#       sudo tree -a $WORKSPACE || true;\
+#       echo;
+#       echo "-----------------------------------";\
+#       echo;\
+#       echo dbg2.1;\
+#       pwd;\
+#       echo;\
+#       ls -lah . ;\
+#       echo;\
+#       ls -lah .. ;\
+#       echo;\
+#       tree . -a -I .git -I .devcontainer -I node_modules;\
+#       echo;\
+#       tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
+#       echo;\
+#       echo dbg2.2
+#       cd $WORKSPACE;\
+#       pwd;\
+#       echo;\
+#       ls -lah . ;\
+#       echo;\
+#       ls -lah .. ;\
+#       echo;\
+#       tree . -a -I .git -I .devcontainer -I node_modules;\
+#       echo;\
+#       tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
+#       echo;\
 
-    - name: dbg3
-      id: dbg3
-      run: |
-        sudo chown -R $USER:$USER $WORKSPACE/* || true;\
-        echo "-----------------------------------";\
-        echo;\
-        echo dbg3.0
-        git status || true;\
-        echo "whoami = $(whoami)";\
-        echo "groups = $(groups)";\
-        echo "[user_id:group] [$(id -u):$(id -g)]";\
-        cat /etc/passwd | grep $(whoami);\
-        sudo tree -a $WORKSPACE || true;\
-        echo;
-        echo "-----------------------------------";\
-        echo;\
-        echo dbg3.1;\
-        pwd;\
-        echo;\
-        ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
-        tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
-        echo dbg2.2
-        cd $WORKSPACE;\
-        pwd;\
-        echo;\
-        ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
-        tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
+#   - name: dbg3
+#     id: dbg3
+#     run: |
+#       sudo chown -R $USER:$USER $WORKSPACE/* || true;\
+#       echo "-----------------------------------";\
+#       echo;\
+#       echo dbg3.0
+#       git status || true;\
+#       echo "whoami = $(whoami)";\
+#       echo "groups = $(groups)";\
+#       echo "[user_id:group] [$(id -u):$(id -g)]";\
+#       cat /etc/passwd | grep $(whoami);\
+#       sudo tree -a $WORKSPACE || true;\
+#       echo;
+#       echo "-----------------------------------";\
+#       echo;\
+#       echo dbg3.1;\
+#       pwd;\
+#       echo;\
+#       ls -lah . ;\
+#       echo;\
+#       ls -lah .. ;\
+#       echo;\
+#       tree . -a -I .git -I .devcontainer -I node_modules;\
+#       echo;\
+#       tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
+#       echo;\
+#       echo dbg2.2
+#       cd $WORKSPACE;\
+#       pwd;\
+#       echo;\
+#       ls -lah . ;\
+#       echo;\
+#       ls -lah .. ;\
+#       echo;\
+#       tree . -a -I .git -I .devcontainer -I node_modules;\
+#       echo;\
+#       tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
+#       echo;\
 
 #   - name: Create Kind Cluster
 #     id: kind-create-cluster-cilium
