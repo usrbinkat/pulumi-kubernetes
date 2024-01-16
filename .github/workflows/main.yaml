@@ -40,9 +40,9 @@ jobs:
     env:
       WORKSPACE: ${{ github.workspace }}
 
-    container:
-      image: ghcr.io/containercraft/konductor:latest
-      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+    #container:
+    #  image: ghcr.io/containercraft/konductor:latest
+    #  options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
 
     steps:
     - name: Run shell script
