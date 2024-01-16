@@ -1,159 +1,160 @@
 ##################################################################################
+# References:
+#   Built-in arguments:
+#   - https://docs.github.com/en/actions/learn-github-actions/contexts
+#   Built-in environment variables:
+#   - https://docs.github.com/en/enterprise-cloud@latest/actions/learn-github-actions/variables#default-environment-variables
+#
 # Develop this workflow locally with the following command:
-# ~$ gh extension install nektos/gh-act
-# ~$ gh act --env-file .env -s GITHUB_TOKEN=$GITHUB_TOKEN -s PULUMI_ACCESS_TOKEN=$PULUMI_ACCESS_TOKEN
+#   ~$ gh extension install nektos/gh-act
+#   ~$ gh act --env-file .env -s GITHUB_TOKEN=$GITHUB_TOKEN -s PULUMI_ACCESS_TOKEN=$PULUMI_ACCESS_TOKEN
 
 name: CI Test Workflow
 on:
-    workflow_dispatch:
-    push:
-        branches:
-        - main
-        paths-ignore:
-        - '.devcontainer/**'
-        - '.vscode/**'
-        - '**.md'
-    pull_request:
-        branches:
-        - main
-        paths-ignore:
-        - '.devcontainer/**'
-        - '.vscode/**'
-        - '**.md'
-    schedule:
-        - cron: '0 0 * * 0'
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.vscode/**'
+    - '**.md'
+  pull_request:
+    branches:
+    - main
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.vscode/**'
+    - '**.md'
+  schedule:
+  - cron: '0 0 * * 0'
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        permissions:
-            actions: write
-            packages: write
-            contents: read
+    permissions:
+      actions: write
+      packages: write
+      contents: read
+    env:
+      WORKSPACE: ${{ github.workspace }}
 
-#       container:
-#           #image: ghcr.io/pulumi/devcontainer:latest
-#           image: ghcr.io/containercraft/konductor:latest
-#           options: --user vscode --privileged --cpus 4 --memory 8g
+    container:
+      image: ghcr.io/containercraft/konductor:latest
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
 
-        steps:
-        -
-            name: Run shell script
-            run: |
-                set -ex;\
-                echo "-----------------------------------";\
-                pwd;\
-                git status || true;\
-                ls -lah;\
-                groups;\
-                echo "-----------------------------------";\
-                echo "user_id:group $(id -u):$(id -g)";\
-                whoami;\
-                cat /etc/passwd | grep $(whoami);\
-                echo "-----------------------------------";\
-                sudo tree -a /_w || true;\
-                sudo chown -R $USER:$USER /_w/* || true;\
-                pwd;\
-                git status || true;\
-                ls -lah;\
-                echo;
+    steps:
+    - name: Run shell script
+      run: |
+        set -ex;\
+        echo "-----------------------------------";\
+        cd $WORKSPACE;\
+        pwd;\
+        git status || true;\
+        ls -lah;\
+        tree .;\
+        groups;\
+        echo "-----------------------------------";\
+        echo "user_id:group $(id -u):$(id -g)";\
+        whoami;\
+        cat /etc/passwd | grep $(whoami);\
+        echo "-----------------------------------";\
+        sudo tree -a $WORKSPACE || true;\
+        sudo chown -R $USER:$USER $WORKSPACE/* || true;\
+        pwd;\
+        git status || true;\
+        ls -lah;\
+        echo;
 
-#               #sudo tree -a /home/github/actions-runner/_w || true;\
-#               #sudo chown -R $USER:$USER /home/github/actions-runner/_w/* || true;\
-#               #sudo tree -a /home/github/actions-runner/_work || true;\
-#               #sudo chown -R $USER:$USER /home/github/actions-runner/_work/* || true;\
-        -
-            name: Git Checkout
-            uses: actions/checkout@v4
-            with:
-                repository: ${{ github.repository }}
-                path: ''
-                clean: 'true'
-                fetch-depth: '1'
-                fetch-tags: 'true'
-                submodules: 'recursive'
-                # Add repository path as safe.directory for Git global config by running `git
-                # config --global --add safe.directory <path>`
-                set-safe-directory: 'true'
-        -
-            name: Run shell script
-            run: set -ex; pwd; git status || true; ls -lah; whoami; groups
+      #               #sudo tree -a /home/github/actions-runner/_w || true;\
+      #               #sudo chown -R $USER:$USER /home/github/actions-runner/_w/* || true;\
+      #               #sudo tree -a /home/github/actions-runner/_work || true;\
+      #               #sudo chown -R $USER:$USER /home/github/actions-runner/_work/* || true;\
+    - name: Git Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository }}
+        path: ''
+        clean: 'true'
+        fetch-depth: '1'
+        fetch-tags: 'true'
+        submodules: 'recursive'
+        # Add repository path as safe.directory for Git global config by running `git
+        # config --global --add safe.directory <path>`
+        set-safe-directory: 'true'
+    - name: Run shell script
+      run: set -ex; pwd; git status || true; ls -lah; whoami; groups
 
-        -
-            name: Git Checkout
-            uses: actions/checkout@v4
-            id: git
+    - name: Git Checkout
+      uses: actions/checkout@v4
+      id: git
 
-        -
-            name: Create Kind Cluster
-            id: kind-create-cluster-cilium
-            run: |
-                set -ex
-                direnv allow
-                sudo docker volume ls
-                sudo docker volume create cilium-control-plane-n01
-                sudo docker volume create cilium-worker-n01
-                sudo docker volume create cilium-worker-n02
-                sudo docker volume ls
-                sudo kind delete cluster --name cilium
-                sleep 5;
-                sudo kind create cluster --name cilium --config hack/kind.yaml --wait 1m || true
-                sudo kind get kubeconfig --name cilium > $KUBECONFIG
-                sleep 30;
-                kubectl --kubeconfig .kube/config get po -owide -A
+    - name: Create Kind Cluster
+      id: kind-create-cluster-cilium
+      run: |
+        set -ex
+        direnv allow
+        sudo docker volume ls
+        sudo docker volume create cilium-control-plane-n01
+        sudo docker volume create cilium-worker-n01
+        sudo docker volume create cilium-worker-n02
+        sudo docker volume ls
+        sudo kind delete cluster --name cilium
+        sleep 5;
+        sudo kind create cluster --name cilium --config hack/kind.yaml --wait 1m || true
+        sudo kind get kubeconfig --name cilium > $KUBECONFIG
+        sleep 30;
+        kubectl --kubeconfig .kube/config get po -owide -A
 
-#       -
-#           name: Provision KinD Cluster
-#           uses: helm/kind-action@v1.8.0
-#           with:
-#               config: hack/kind.yaml
-#               install_only: true
-#               cluster_name: cilium
-#               wait: true
+      #       -
+      #           name: Provision KinD Cluster
+      #           uses: helm/kind-action@v1.8.0
+      #           with:
+      #               config: hack/kind.yaml
+      #               install_only: true
+      #               cluster_name: cilium
+      #               wait: true
 
-        -
-            name: Pulumi Setup
-            id: pulumi-up
-            run: |
-                set -ex
-                direnv allow
-                pwd
-                sudo kind get kubeconfig --name cilium > $KUBECONFIG
-                pulumi login --local
-                pulumi stack init iac-mesh-pac
-                pulumi stack select iac-mesh-pac
-                pulumi install
-                pulumi up --yes --skip-preview
-                sleep 30
-                kubectl --kubeconfig .kube/config get po -owide -A
-                sleep 30
-                kubectl --kubeconfig .kube/config get po -owide -A
+    - name: Pulumi Setup
+      id: pulumi-up
+      run: |
+        set -ex
+        direnv allow
+        pwd
+        sudo kind get kubeconfig --name cilium > $KUBECONFIG
+        pulumi login --local
+        pulumi stack init iac-mesh-pac
+        pulumi stack select iac-mesh-pac
+        pulumi install
+        pulumi up --yes --skip-preview
+        sleep 30
+        kubectl --kubeconfig .kube/config get po -owide -A
+        sleep 30
+        kubectl --kubeconfig .kube/config get po -owide -A
 
-        -
-            name: Cilium Status
-            id: cilium-status
-            run: |
-                set -ex
-                direnv allow
-                pwd
-                sudo kind get kubeconfig --name cilium > .kube/config
-                kubectl --kubeconfig .kube/config get po -owide -A
-                cilium status --wait --wait-duration 3m
-                sleep 30
-                kubectl --kubeconfig .kube/config get po -owide -A
+    - name: Cilium Status
+      id: cilium-status
+      run: |
+        set -ex
+        direnv allow
+        pwd
+        sudo kind get kubeconfig --name cilium > .kube/config
+        kubectl --kubeconfig .kube/config get po -owide -A
+        cilium status --wait --wait-duration 3m
+        sleep 30
+        kubectl --kubeconfig .kube/config get po -owide -A
 
-        -
-            name: Cleanup
-            run: |
-                set -ex
-                direnv allow
-                sudo kind delete cluster --name cilium
-                sudo docker volume ls
-                #sudo docker volume rm cilium-control-plane-n01
-                #sudo docker volume rm cilium-worker-n01
-                #sudo docker volume rm cilium-worker-n02
-                #sudo docker volume ls
+    - name: Cleanup
+      run: |
+        set -ex
+        direnv allow
+        sudo kind delete cluster --name cilium
+        sudo docker volume ls
+        #sudo docker volume rm cilium-control-plane-n01
+        #sudo docker volume rm cilium-worker-n01
+        #sudo docker volume rm cilium-worker-n02
+        #sudo docker volume ls
 
 #       -
 #           name: Pulumi Preview
