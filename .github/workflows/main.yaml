@@ -43,13 +43,13 @@ jobs:
         echo "::set-output name=gid::$(id -g)"
     - id: get_vars
       run: |
-        echo "UID=$(echo ${{ steps.set_vars.outputs.uid }})" | tee -a ${GITHUB_ENV}
-        echo "GID=$(echo ${{ steps.set_vars.outputs.gid }})" | tee -a ${GITHUB_ENV}
+        echo "HOST_UID=$(echo ${{ steps.set_vars.outputs.uid }})" | tee -a ${GITHUB_ENV}
+        echo "HOST_GID=$(echo ${{ steps.set_vars.outputs.gid }})" | tee -a ${GITHUB_ENV}
         echo "whoami = $(whoami)"
         echo "groups = $(groups)"
         source ${GITHUB_ENV}
-        echo "UID=$UID"
-        echo "GID=$GID"
+        echo "UID=$HOST_UID"
+        echo "GID=$HOST_GID"
 
   configure:
     runs-on: ubuntu-latest
