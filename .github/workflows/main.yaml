@@ -1,6 +1,8 @@
+##################################################################################
 # Develop this workflow locally with the following command:
 # ~$ gh extension install nektos/gh-act
 # ~$ gh act --env-file .env -s GITHUB_TOKEN=$GITHUB_TOKEN -s PULUMI_ACCESS_TOKEN=$PULUMI_ACCESS_TOKEN
+
 name: CI Test Workflow
 on:
     workflow_dispatch:
@@ -24,20 +26,39 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
-        container:
-            #image: ghcr.io/pulumi/devcontainer:latest
-            image: ghcr.io/containercraft/konductor:latest
-            options: --user vscode --privileged --cpus 4 --memory 8g
 
         permissions:
             actions: write
             packages: write
             contents: read
 
+        container:
+            #image: ghcr.io/pulumi/devcontainer:latest
+            image: ghcr.io/containercraft/konductor:latest
+            options: --user vscode --privileged --cpus 4 --memory 8g
         steps:
         -
             name: Run shell script
-            run: set -ex; pwd; git status || true; ls -lah; whoami; groups
+            run: |
+                set -ex;\
+                echo "-----------------------------------";\
+                pwd;\
+                git status || true;\
+                ls -lah;\
+                groups;\
+                echo "-----------------------------------";\
+                echo "user_id:group $(id -u):$(id -g)";\
+                whoami;\
+                cat /etc/passwd | grep $(whoami);\
+                echo "-----------------------------------";\
+                sudo tree -a /home/github/actions-runner/_w || true;\
+                sudo chown -R $USER:$USER /home/github/actions-runner/_w/* || true;\
+                sudo tree -a /home/github/actions-runner/_work || true;\
+                sudo chown -R $USER:$USER /home/github/actions-runner/_work/* || true;\
+                pwd;\
+                git status || true;\
+                ls -lah;\
+                echo;
         -
             name: Git Checkout
             uses: actions/checkout@v4
