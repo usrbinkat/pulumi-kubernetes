@@ -32,39 +32,12 @@ on:
 jobs:
   configure:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     defaults:
       run:
         shell: bash
     steps:
     - id: map-uid-gid
       run: echo UID_GID="$(id -u):$(id -g)" | tee -a ${GITHUB_ENV}
-
-  build:
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
-    permissions:
-      actions: write
-      packages: write
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    env:
-      WORKSPACE: ${{ github.workspace }}
-    container:
-      image: ghcr.io/containercraft/konductor:latest
-      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ github.env.UID_GID }}
-
-    steps:
-
-    - name: Ammend Environment Variables
-      id: environment
-      run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
 
     - name: dbg1
       id: dbg1
@@ -105,11 +78,30 @@ jobs:
         tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
 
-      # #sudo chown -R $USER:$USER $WORKSPACE/* || true;\
-      #               #sudo tree -a /home/github/actions-runner/_w || true;\
-      #               #sudo chown -R $USER:$USER /home/github/actions-runner/_w/* || true;\
-      #               #sudo tree -a /home/github/actions-runner/_work || true;\
-      #               #sudo chown -R $USER:$USER /home/github/actions-runner/_work/* || true;\
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      actions: write
+      packages: write
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    env:
+      WORKSPACE: ${{ github.workspace }}
+    container:
+      image: ghcr.io/containercraft/konductor:latest
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ github.env.UID_GID }}
+
+    steps:
+
+    - name: Ammend Environment Variables
+      id: environment
+      run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
+
     - name: Git Checkout
       uses: actions/checkout@v4
       with:
