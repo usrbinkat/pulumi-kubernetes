@@ -1,24 +1,24 @@
-
-/usr/bin/docker create \
-    --name magic \
-    --label magics \
+/usr/bin/docker creat \
+    --name ceb882487a274ad789a953388e3894ad_ghcriocontainercraftkonductorlatest_422d8 \
+    --label e8179 \
     --workdir /__w/iac-mesh-pac/iac-mesh-pac \
-    --network=host \
+    --network github_network_10c19d6505f94f5e9fb4c8018abf485 \
     --user vscode \
-    --privileged \
-    --cpus 4 \
-    --memory 8g \
+    --privilege \
+    --cpus  \
+    --memory 8 \
     --workdir /home/runner/work/iac-mesh-pac/iac-mesh-pac \
     --user  \
     -e "HOME=/github/home" \
     -e GITHUB_ACTIONS=true \
-    -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" \
+    -e CI=true \
     -v "/home/runner/work":"/__w" \
-    -v "/home/runner/runners/2.311.0/externals":"/__e":ro \
     -v "/home/runner/work/_temp":"/__w/_temp" \
+    -v "/home/runner/runners/2.311.0/externals":"/__e":ro \
     -v "/home/runner/work/_actions":"/__w/_actions" \
-    -v "/opt/hostedtoolcache":"/__t" \
     -v "/home/runner/work/_temp/_github_home":"/github/home" \
-    -v "/home/runner/work/_temp/_github_workflow":"/github/workflow"
-    --entrypoint "tail" \
-    ghcr.io/containercraft/konductor:latest "-f" "/dev/null"'^
+    -v "/home/runner/work/_temp/_github_workflow":"/github/workflow \
+    -v "/var/run/docker.sock":"/var/run/docker.sock" \
+    -v "/opt/hostedtoolcache":"/__t" \
+    --entrypoint "tail" ghcr.io/containercraft/konductor:latest "-f" "/dev/null" \
+    ;echo
