@@ -60,7 +60,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - id: "Set User:Group Ownership"
+    - name: "Set User:Group Ownership"
       run: set -ex; sudo chown -R $USER:$USER $GITHUB_WORKSPACE
 
     - name: dbg1
