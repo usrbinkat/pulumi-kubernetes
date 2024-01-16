@@ -1,3 +1,6 @@
+# Develop this workflow locally with the following command:
+# ~$ gh extension install nektos/gh-act
+# ~$ gh act --env-file .env -s GITHUB_TOKEN=$GITHUB_TOKEN -s PULUMI_ACCESS_TOKEN=$PULUMI_ACCESS_TOKEN
 name: CI Test Workflow
 on:
     workflow_dispatch:
@@ -36,7 +39,18 @@ jobs:
             name: Run shell script
             run: set -ex; pwd; git status || true; ls -lah; whoami; groups
         -
-            uses: actions/checkout@v2
+            name: Git Checkout
+            uses: actions/checkout@v4
+            with:
+                repository: ${{ github.repository }}
+                path: ''
+                clean: 'true'
+                fetch-depth: '1'
+                fetch-tags: 'true'
+                submodules: 'recursive'
+                # Add repository path as safe.directory for Git global config by running `git
+                # config --global --add safe.directory <path>`
+                set-safe-directory: 'true'
         -
             name: Run shell script
             run: set -ex; pwd; git status || true; ls -lah; whoami; groups
