@@ -43,7 +43,6 @@ jobs:
       id: dbg1
       run: |
         echo "-----------------------------------";\
-        echo;\
         echo dbg1.0
         git status || true;\
         echo "whoami = $(whoami)";\
@@ -51,38 +50,22 @@ jobs:
         echo "[user_id:group] [$(id -u):$(id -g)]";\
         cat /etc/passwd | grep $(whoami);\
         sudo tree -a $WORKSPACE || true;\
-        echo;
-        echo "-----------------------------------";\
-        echo;\
-        echo dbg1.1;\
-        pwd;\
-        echo;\
+        echo pwd;\
+        $(pwd);\
+        echo "ls -lah";\
         ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
-        echo dbg1.3
+        echo "change dir to WORKSPACE"
         cd $WORKSPACE;\
-        pwd;\
-        echo;\
+        echo pwd;\
+        $(pwd);\
+        echo "ls -lah";\
         ls -lah . ;\
-        echo;\
-        ls -lah .. ;\
-        echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
-        echo;\
-        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
-        echo;\
+        echo "-----------------------------------";\
 
   build:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     permissions:
       actions: write
       packages: write
