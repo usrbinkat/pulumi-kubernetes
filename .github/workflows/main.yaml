@@ -57,8 +57,8 @@ jobs:
         echo;\
         echo dbg1.0
         git status || true;\
-        echo "whoami = $(whoami);\
-        echo "groups = $(groups);\
+        echo "whoami = $(whoami)";\
+        echo "groups = $(groups)";\
         echo "[user_id:group] [$(id -u):$(id -g)]";\
         cat /etc/passwd | grep $(whoami);\
         sudo tree -a $WORKSPACE || true;\
@@ -114,8 +114,8 @@ jobs:
         echo;\
         echo dbg2.0
         git status || true;\
-        echo "whoami = $(whoami);\
-        echo "groups = $(groups);\
+        echo "whoami = $(whoami)";\
+        echo "groups = $(groups)";\
         echo "[user_id:group] [$(id -u):$(id -g)]";\
         cat /etc/passwd | grep $(whoami);\
         sudo tree -a $WORKSPACE || true;\
@@ -154,8 +154,8 @@ jobs:
         echo;\
         echo dbg3.0
         git status || true;\
-        echo "whoami = $(whoami);\
-        echo "groups = $(groups);\
+        echo "whoami = $(whoami)";\
+        echo "groups = $(groups)";\
         echo "[user_id:group] [$(id -u):$(id -g)]";\
         cat /etc/passwd | grep $(whoami);\
         sudo tree -a $WORKSPACE || true;\
