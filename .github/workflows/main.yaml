@@ -32,10 +32,11 @@ jobs:
             packages: write
             contents: read
 
-        container:
-            #image: ghcr.io/pulumi/devcontainer:latest
-            image: ghcr.io/containercraft/konductor:latest
-            options: --user vscode --privileged --cpus 4 --memory 8g
+#       container:
+#           #image: ghcr.io/pulumi/devcontainer:latest
+#           image: ghcr.io/containercraft/konductor:latest
+#           options: --user vscode --privileged --cpus 4 --memory 8g
+
         steps:
         -
             name: Run shell script
