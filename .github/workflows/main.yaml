@@ -41,6 +41,14 @@ jobs:
       run: |
         echo "::set-output name=uid::$(id -u)"
         echo "::set-output name=gid::$(id -g)"
+    - id: get_vars
+      run: |
+        echo "UID=$(echo ${{ steps.set_vars.outputs.uid }})" | tee -a ${GITHUB_ENV}
+        echo "GID=$(echo ${{ steps.set_vars.outputs.gid }})" | tee -a ${GITHUB_ENV}
+        echo "whoami = $(whoami)"
+        echo "groups = $(groups)"
+        echo "UID=$UID"
+        echo "GID=$GID"
 
   configure:
     runs-on: ubuntu-latest
