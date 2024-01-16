@@ -57,7 +57,7 @@ jobs:
         shell: bash
     container:
       image: ghcr.io/containercraft/konductor:latest
-      options: --user 1001:127 --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+      options: --user 1001:127 --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --volume="/etc/group:/etc/group:ro" --volume="/etc/passwd:/etc/passwd:ro" --volume="/etc/shadow:/etc/shadow:ro"
 #     options: --user ${{ needs.setup.outputs.uid }}:${{ steps.set_vars.outputs.gid }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
     steps:
 
