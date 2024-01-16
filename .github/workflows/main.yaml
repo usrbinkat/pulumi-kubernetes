@@ -58,7 +58,7 @@ jobs:
       WORKSPACE: ${{ github.workspace }}
     container:
       image: ghcr.io/containercraft/konductor:latest
-      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ env.UID_GID }}
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ github.env.UID_GID }}
 
     steps:
 
