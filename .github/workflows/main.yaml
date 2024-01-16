@@ -30,8 +30,24 @@ on:
   - cron: '0 0 * * 0'
 
 jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      uid: ${{ steps.set_vars.outputs.uid }}
+      gid: ${{ steps.set_vars.outputs.gid }}
+    steps:
+    - id: set_vars
+      run: |
+        echo "::set-output name=uid::$(id -u)"
+        echo "::set-output name=gid::$(id -g)"
+
   configure:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/containercraft/konductor:latest
+      options: --user ${{ needs.setup.outputs.uid }}:${{ needs.setup.outputs.gid }} --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+
     defaults:
       run:
         shell: bash
