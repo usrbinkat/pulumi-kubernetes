@@ -36,7 +36,7 @@ jobs:
       uid_gid: ${{ steps.map-uid-gid.outputs.uid_gid }}
     steps:
     - id: map-uid-gid
-      run: echo "::set-output name=uid_gid::$(id -u):$(id -g)"
+      run: set -ex 2>&1 1>/dev/null && echo "::set-output name=uid_gid::$(id -u):$(id -g)"
 
   build:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
 
     container:
       image: ghcr.io/containercraft/konductor:latest
-      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ needs.configure.outputs.uid_gid }}
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ needs.configure.outputs.map-uid-gid }}
 
     steps:
     - name: Ammend Environment Variables
