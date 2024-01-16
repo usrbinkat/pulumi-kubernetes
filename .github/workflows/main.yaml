@@ -30,6 +30,14 @@ on:
   - cron: '0 0 * * 0'
 
 jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      uid_gid: ${{ steps.map-uid-gid.outputs.uid_gid }}
+    steps:
+    - id: map-uid-gid
+      run: echo "::set-output name=uid_gid::$(id -u):$(id -g)"
+
   build:
     runs-on: ubuntu-latest
 
@@ -40,15 +48,14 @@ jobs:
     env:
       WORKSPACE: ${{ github.workspace }}
 
-    #container:
-    #  image: ghcr.io/containercraft/konductor:latest
-    #  options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }}
+    container:
+      image: ghcr.io/containercraft/konductor:latest
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ needs.configure.outputs.uid_gid }}
 
     steps:
     - name: Ammend Environment Variables
       id: environment
-      run: |
-        echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
+      run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
 
     - name: dbg1
       id: dbg1
@@ -74,7 +81,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
         echo dbg1.3
         cd $WORKSPACE;\
@@ -86,7 +93,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
 
       # #sudo chown -R $USER:$USER $WORKSPACE/* || true;\
@@ -131,7 +138,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
         echo dbg2.2
         cd $WORKSPACE;\
@@ -143,7 +150,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
 
     - name: dbg3
@@ -171,7 +178,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
         echo dbg2.2
         cd $WORKSPACE;\
@@ -183,7 +190,7 @@ jobs:
         echo;\
         tree . -a -I .git -I .devcontainer -I node_modules;\
         echo;\
-        tree .. -a -I .git -I .devcontainer -I node_modules;\
+        tree .. -a -I iac-mesh-pac/.git -I iac-mesh-pac/.devcontainer -I iac-mesh-pac/node_modules;\
         echo;\
 
 #   - name: Create Kind Cluster
