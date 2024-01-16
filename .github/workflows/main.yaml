@@ -32,27 +32,36 @@ on:
 jobs:
   configure:
     runs-on: ubuntu-latest
-    outputs:
-      uid_gid: ${{ steps.map-uid-gid.outputs.uid_gid }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    defaults:
+      run:
+        shell: bash
     steps:
     - id: map-uid-gid
-      run: set -ex 2>&1 1>/dev/null && echo "::set-output name=uid_gid::$(id -u):$(id -g)"
+      run: echo UID_GID="$(id -u):$(id -g)" | tee -a ${GITHUB_ENV}
 
   build:
     runs-on: ubuntu-latest
-
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       actions: write
       packages: write
       contents: read
+    defaults:
+      run:
+        shell: bash
     env:
       WORKSPACE: ${{ github.workspace }}
-
     container:
       image: ghcr.io/containercraft/konductor:latest
-      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ needs.configure.outputs.map-uid-gid }}
+      options: --user vscode --privileged --cpus 4 --memory 8g --workdir ${{ github.workspace }} --user ${{ env.UID_GID }}
 
     steps:
+
     - name: Ammend Environment Variables
       id: environment
       run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F [\/] '{print $1}')" | tee -a ${GITHUB_ENV};\
