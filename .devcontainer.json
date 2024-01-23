@@ -1,11 +1,12 @@
 // Reference:
 // - https://containers.dev/features
 // - https://containers.dev/implementors/features
+// - https://containers.dev/implementors/json_reference
 // - https://code.visualstudio.com/docs/getstarted/settings
 {
   "name": "konductor",
-  //"image": "ghcr.io/containercraft/konductor:latest",
-  "dockerFile": ".github/devcontainer/Dockerfile",
+  "image": "ghcr.io/containercraft/konductor",
+  //"dockerFile": ".github/docker/Dockerfile",
   "customizations": {
     "vscode": {
       "settings": {
@@ -44,6 +45,7 @@
         "editor.terminal.integrated.shell.linux": "/usr/bin/fish",
         "terminal.integrated.fontFamily": "FiraMono Nerd Font Mono",
         "terminal.integrated.shell.linux": "/usr/bin/fish",
+        "terminal.integrated.shellArgs.linux": ["-c", "connect"],
         "terminal.integrated.sendKeybindingsToShell": true,
         "workbench.colorTheme": "Dracula Soft",
         "explorer.openEditors.visible": 1,
@@ -58,7 +60,6 @@
         "ms-python.python",
         "redhat.vscode-yaml",
         "esbenp.prettier-vscode",
-        "ms-vscode.makefile-tools",
         "ms-vsliveshare.vsliveshare",
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
@@ -71,24 +72,11 @@
     }
   },
   "features": {
-    //"ghcr.io/devcontainers/features/common-utils:2": {
-    //    "username": "vscode",
-    //    "userGid": "automatic",
-    //    "userUid": "automatic",
-    //    "upgradePackages": false,
-    //    "nonFreePackages": false
-    //},
-    //"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-    //    "installDockerBuildx": false,
-    //    "dockerDashComposeVersion": "v2",
-    //    "version": "latest",
-    //    "moby": false
-    //}
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "remoteUser": "vscode",
   "forwardPorts": [1313, 2222, 6000, 7681, 8080],
-  "postCreateCommand": "git submodule update --init --recursive; direnv allow",
+  "postCreateCommand": "sudo chown $USER -R /workspaces 2>/dev/null || true; direnv allow 2>/dev/null || true",
   "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
   "runArgs": ["--init", "--privileged", "--network=host"],
   "overrideCommand": false
