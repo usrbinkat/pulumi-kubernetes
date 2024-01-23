@@ -11,17 +11,6 @@ This repo is a Pulumi IaC implementation of the [Cilium Network Policy](https://
 ## How To
 
 ```bash
-# Create Docker Volumes
-docker volume create cilium-worker-n01
-docker volume create cilium-worker-n02
-docker volume create cilium-control-plane-n01
-
-# Create Kind Cluster
-kind create cluster --config hack/kind.yaml
-
-# Pulumi Cloud Login
-pulumi login
-
 # Grab NPM dependencies
 pulumi install
 
@@ -67,21 +56,10 @@ iac-mesh-pac on <> main via <> v20.11.0 via <> usrbinkat@iac-mesh-pac
 ### Cleanup
 
 ```bash
-# Pulumi Destroy Stack
-pulumi down
+# Pulumi Destroy Stack & Delete Kind Cluster
+make clean
 
-# Delete Pulumi Stack
-pulumi stack rm iac-mesh-pac
-
-# Delete Kind Cluster
-kind delete cluster --name iac-mesh-pac
-
-# Delete Docker Volumes
-docker volume rm cilium-worker-n01
-docker volume rm cilium-worker-n02
-docker volume rm cilium-control-plane-n01
-
-# Delete Github Codespace
+# Delete Codespace
 gh codespace delete --codespace ${CODESPACE_NAME}
 ```
 

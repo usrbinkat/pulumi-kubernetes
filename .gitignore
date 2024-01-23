@@ -4,3 +4,6 @@
 .kube/config
 .pulumi
 .pulumi/*
+.kube/config
+.talos/config
+.pulumi/*
