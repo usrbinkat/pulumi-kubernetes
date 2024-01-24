@@ -15,8 +15,8 @@ This repo is a Pulumi IaC implementation of the [Cilium Network Policy](https://
 pulumi install
 
 # Pulumi Deploy Stack
-pulumi stack init iac-mesh-pac
-pulumi stack select iac-mesh-pac
+pulumi stack init pac
+pulumi stack select pac
 pulumi up
 ```
 
