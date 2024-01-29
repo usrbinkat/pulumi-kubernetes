@@ -7,3 +7,4 @@
 .kube/config
 .talos/config
 .pulumi/*
+.env*
