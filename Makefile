@@ -60,12 +60,12 @@ pulumi-login:
 	@PULUMI_ACCESS_TOKEN=${PULUMI_ACCESS_TOKEN} pulumi login \
 		| sed 's/${ESCAPED_PAT}/***PULUMI_ACCESS_TOKEN***/g' || true
 	@pulumi install || true
-	@pulumi stack select --create ${PULUMI_STACK_IDENTIFIER} || true
 	@echo "Login successful."
 
 # --- Pulumi Deployment ---
 pulumi-up:
 	@echo "Deploying Pulumi infrastructure..."
+	@pulumi stack select --create ${PULUMI_STACK_IDENTIFIER} || true
 	@KUBECONFIG=${KUBE_CONFIG_FILE} PULUMI_ACCESS_TOKEN=${PULUMI_ACCESS_TOKEN} \
 		pulumi up --yes --skip-preview --refresh --stack ${PULUMI_STACK_IDENTIFIER} \
 		| sed 's/${ESCAPED_PAT}/***PULUMI_ACCESS_TOKEN***/g'
@@ -143,17 +143,17 @@ talos: clean-all talos-cluster talos-ready wait-all-pods
 kind-cluster:
 	@echo "Creating Kind Cluster..."
 	@direnv allow
-	@mkdir -p .kube || true
-	@touch .kube/config || true
-	@chmod 600 .kube/config || true
+	@mkdir -p ${HOME}/.kube .kube || true
+	@touch ${HOME}/.kube/config .kube/config || true
+	@chmod 600 ${HOME}/.kube/config .kube/config || true
 	@sudo docker volume create cilium-worker-n01
 	@sudo docker volume create cilium-worker-n02
 	@sudo docker volume create cilium-control-plane-n01
 	@sudo kind create cluster --wait 1m --retain --config=hack/kind.yaml
 	@sudo kind get clusters
 	@sudo kind get kubeconfig --name cilium | tee ${KUBE_CONFIG_FILE} 1>/dev/null
+	@sudo kind get kubeconfig --name cilium | tee ${HOME}/.kube/config 1>/dev/null
 	@sudo chown -R $(id -u):$(id -g) ${KUBE_CONFIG_FILE}
-	@pulumi config set kubernetes kind || true
 	@echo "Created Kind Cluster."
 
 # --- Wait for Kind Cluster Ready ---
@@ -165,7 +165,7 @@ kind-ready:
 	@bash -c 'until kubectl --kubeconfig ${KUBE_CONFIG_FILE} wait --for=condition=Ready pod -l component=kube-controller-manager --namespace=kube-system --timeout=180s; do echo "Waiting for kube-controller-manager to be ready..."; sleep 5; done'
 	@echo "Kind Cluster is ready."
 
-kind: login kind-cluster kind-ready
+kind: kind-cluster kind-ready
 
 # ----------------------------------------------------------------------------------------------
 # --- Maintenance ---

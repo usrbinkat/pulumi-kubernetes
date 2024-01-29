@@ -8,3 +8,4 @@
 .talos/config
 .pulumi/*
 .env*
+Pulumi.*.yaml

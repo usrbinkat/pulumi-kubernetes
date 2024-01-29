@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/usrbinkat/iac-mesh-pac)]() [![Pulumi](https://img.shields.io/badge/pulumi-v3.101.1-blueviolet)](https://www.pulumi.com/docs/get-started/install/) [![Cilium](https://img.shields.io/badge/cilium-v1.14.5-blueviolet)](https://docs.cilium.io/en/v1.9/gettingstarted/kind/) [![Kubectl](https://img.shields.io/badge/kubectl-v1.29.0-blueviolet)](https://kubernetes.io/docs/tasks/tools/install-kubectl/) [![Docker](https://img.shields.io/badge/docker-v24.0.7-blueviolet)](https://docs.docker.com/get-docker/) [![Kind](https://img.shields.io/badge/kind-v0.20.0-blueviolet)](https://kind.sigs.k8s.io/docs/user/quick-start/) [![Helm](https://img.shields.io/badge/helm-v3.13.3-blueviolet)](https://helm.sh/docs/intro/install/)
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/usrbinkat/iac-mesh-pac)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/usrbinkat/cilium-kubernetes)
 
 ## About
 
@@ -11,12 +11,16 @@ This repo is a Pulumi IaC implementation of the [Cilium Network Policy](https://
 ## How To
 
 ```bash
-# Grab NPM dependencies
-pulumi install
+# Create Kind Cluster
+make kind
+
+# Pulumi Login
+pulumi login
+
+# Pulumi Create/Select Stack
+pulumi stack select --create ${USER}/cilium-kubernetes/dev
 
 # Pulumi Deploy Stack
-pulumi stack init pac
-pulumi stack select pac
 pulumi up
 ```
 
