@@ -40,7 +40,7 @@ make kind
 pulumi login && pulumi install
 
 # Pulumi Create/Select Stack
-pulumi stack select --create ${USER}/cilium-kubernetes/dev
+pulumi stack select --create ${GITHUB_USER}/cilium-kubernetes/dev
 
 # Pulumi Deploy Stack
 pulumi up
@@ -49,8 +49,11 @@ pulumi up
 #### 3. Test Cilium Network Policy
 
 ```bash
-# TODO: Commands Go Here
-curl https://blabla.com
+# Curl policy compliant
+kubectl exec tiefighter -- curl -vs -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
+
+# Curl policy non-compliant
+kubectl exec xwing -- curl -vs -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
 ```
 
 #### 4. Cleanup
@@ -58,6 +61,11 @@ curl https://blabla.com
 ```bash
 # Pulumi Destroy Stack & Delete Kind Cluster
 make clean
+
+# Stop Github Codespaces
+# After stopping the GH Codespace go to the GH Codespaces dashboard and delete the codespace
+# - https://github.com/codespaces
+make stop
 ```
 
 ### Repo Tree
