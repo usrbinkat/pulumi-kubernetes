@@ -73,6 +73,7 @@ pulumi-up:
 
 pulumi-down:
 	@echo "Deploying Pulumi infrastructure..."
+	@pulumi stack select --create ${PULUMI_STACK_IDENTIFIER} || true
 	@KUBECONFIG=${KUBE_CONFIG_FILE} PULUMI_ACCESS_TOKEN=${PULUMI_ACCESS_TOKEN} \
 		pulumi down --yes --skip-preview --refresh --stack ${PULUMI_STACK_IDENTIFIER} \
 		| sed 's/${ESCAPED_PAT}/***PULUMI_ACCESS_TOKEN***/g' || \
