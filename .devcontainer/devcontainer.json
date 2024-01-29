@@ -32,7 +32,7 @@
                     "defaultViewMode": "list"
                 },
                 "vim": {
-                    "disableExtension": false,
+                    "disableExtension": true,
                     "useSystemClipboard": true,
                     "useCtrlKeys": true,
                     "easymotion": true,
