@@ -84,7 +84,8 @@ make clean
 > ├── .gitignore               # Specifies intentionally untracked files to ignore
 > ├── .gitmodules              # Git Submodule configuration file
 > ├── .github
-> │   └── konductor            # Git submodule for GitHub Codespaces Devcontainer
+> │   ├── konductor            # Git submodule for GitHub Codespaces Devcontainer
+> │   └── workflows/ci.yaml    # Github Actions Runner CI workflow
 > ├── .kube                    # Kubernetes configuration directory
 > │   └── config               # Kubernetes credentials file (gitignored)
 > └── .pulumi                  # Pulumi configuration and state files
