@@ -35,28 +35,42 @@ To try the Cilium Network Policy demo, follow these steps:
 make kind
 ```
 
-#### 2. Deploy Cilium and Cilium Network Policy
+### 2. Deploy Cilium and Cilium Network Policy
 
 ```bash
 # Pulumi Login && Install Typescript Dependencies
 pulumi login && pulumi install
 
 # Pulumi Create/Select Stack
-pulumi stack select --create ${GITHUB_USER}/cilium-kubernetes/dev
+pulumi stack select --create $GITHUB_USER/cilium-kubernetes/dev
 
 # Pulumi Deploy Stack
 pulumi up
 ```
 
-#### 3. Test Cilium Network Policy
+### 3. Check pods and labels
+
+The network policy is enforced by matching policies to pods based on their labels. The `tiefighter` pod has the label `app=starwars` and the `xwing` pod has the label `app=starwars` and `role=xwing`.
+
+```bash
+# Check that the pods are running & have appropriate labels
+kubectl get pods --show-labels
+```
+
+![kubectl get po --show-labels](.github/assets/kubectl-get-po-show-labels.png)
+
+### 4. Test Cilium Network Policy
+
+We will use curl to test the network policy. The `tiefighter` pod is compliant with the policy and the `xwing` pod is non-compliant. The `tiefighter` pod should be able to access the `deathstar` and return `Ship landed`, while the `xwing` pod will fail to respond due to traffic policy denying the traffic.
 
 ```bash
 # Curl policy compliant
-kubectl exec tiefighter -- curl -vs -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
+kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
 
 # Curl policy non-compliant
-kubectl exec xwing -- curl -vs -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
+kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing
 ```
+![kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing](.github/assets/kubectl-exec-xwing.png)
 
 #### 4. Cleanup
 
@@ -65,10 +79,11 @@ kubectl exec xwing -- curl -vs -XPOST deathstar.starwars.svc.cluster.local/v1/re
 make clean
 
 # Stop Github Codespaces
-# After stopping the GH Codespace go to the GH Codespaces dashboard and delete the codespace
-# - https://github.com/codespaces
 make stop
 ```
+
+> After stopping the GH Codespace go to the GH Codespaces dashboard and delete the Codespace
+> - https://github.com/codespaces
 
 ### Repo Tree
 
