@@ -67,9 +67,13 @@ We will use curl to test the network policy. The `tiefighter` pod is compliant w
 # Curl policy compliant
 kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
 
+# Curl policy compliant
+kubectl exec xwing -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
+
 # Curl policy non-compliant
 kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing
 ```
+
 ![kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing](.github/assets/kubectl-exec-xwing.png)
 
 #### 4. Cleanup
@@ -83,6 +87,7 @@ make stop
 ```
 
 > After stopping the GH Codespace go to the GH Codespaces dashboard and delete the Codespace
+>
 > - https://github.com/codespaces
 
 ### Repo Tree
