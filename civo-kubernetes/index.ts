@@ -50,7 +50,7 @@ const cluster = new civo.KubernetesCluster("davenull-kubernetes", {
   },
   region: "NYC1",
   firewallId: firewall.id,
-  clusterType: "talos",
+  clusterType: "k3s",
   cni: "cilium",
   }, {
     provider: civoProvider,
@@ -62,7 +62,7 @@ export const clusterName = cluster.name;
 // CIVO Kubernetes Provider instance
 // Pull kubeconfig from the cluster resource outputs
 const k8sProvider = new k8s.Provider("civo-kubernetes", {
-  kubeconfig: cluster.kubeconfig.apply(JSON.stringify),
+  kubeconfig: cluster.kubeconfig,
 });
 
 // pulumi output kubernetes kubeconfig as json string
@@ -80,7 +80,11 @@ const demoApp = new k8s.yaml.ConfigFile("http-sw-app", {
     ],
     file: "https://raw.githubusercontent.com/cilium/cilium/HEAD/examples/minikube/http-sw-app.yaml",
     resourcePrefix: "deathstar",
-});
+},{
+    provider: k8sProvider,
+    dependsOn: [cluster]
+    }
+);
 
 // A variable indicating whether the policy should be strict
 // retrieve bool condition from pulumi config to enable/disable policyStrict
@@ -127,5 +131,8 @@ if (policyStrict) {
                 },
             ],
         },
+    }, {
+    provider: k8sProvider,
+    dependsOn: [cluster]
     });
 }
