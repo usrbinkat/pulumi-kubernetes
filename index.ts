@@ -36,12 +36,21 @@ const ciliumHelmValues = {
     tunnelProtocol: "vxlan",
     k8sServiceHost: serverIPs[0],
     kubeProxyReplacement: "strict",
-    nativeRoutingCIDR: "10.2.0.0/16",
+//  This value should be set to the cidr to exclude with nat. the podCidr.
+//  Leave this value default unless you know what you are about. 
+//  nativeRoutingCIDR: "10.2.0.0/16",
     image: { pullPolicy: "IfNotPresent" },
     hostServices: { enabled: false },
     cluster: { name: "kind-cilium" },
     externalIPs: { enabled: true },
     gatewayAPI: { enabled: false },
+    hubble: { 
+      enabled: true,
+      relay: {
+        enabled: true },
+      ui: {
+        enabled: true },
+    },
     ipam: { mode: "kubernetes" },
     nodePort: { enabled: true },
     hostPort: { enabled: true },
