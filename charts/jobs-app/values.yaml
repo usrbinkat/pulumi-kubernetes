@@ -1,0 +1,172 @@
+strimzi-kafka-operator:
+  enabled: true
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 4
+
+kafka:
+  replicas: 1
+
+kafkaTopic:
+  partitions: 1
+
+elasticsearch:
+  enabled: true
+  # deploy 1 replica instead of 3
+  replicas: 1
+  # Shrink default JVM heap.
+  esJavaOpts: "-Xmx128m -Xms128m"
+  # Allocate smaller chunks of memory per pod.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512M"
+    limits:
+      cpu: "1000m"
+      memory: "512M"
+  # Request smaller persistent volumes.
+  volumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 10Gi
+  secret:
+    password: changeme
+  lifecycle:
+    postStart:
+      exec:
+        command:
+          - bash
+          - -c
+          - |
+            #!/bin/bash
+            # Add a template to adjust number of shards/replicas
+            SHARD_COUNT=1
+            REPLICA_COUNT=0
+            ES_URL=http://localhost:9200
+            while [[ "$(curl -s -o /dev/null -w '%{http_code}\n' $ES_URL)" != "200" ]]; do sleep 1; done
+            curl -XPUT "$ES_URL/_template/default" -H 'Content-Type: application/json' -d'{"index_patterns":['\""*"\"'],"order": -1,"settings":{"number_of_shards":'$SHARD_COUNT',"number_of_replicas":'$REPLICA_COUNT'}}'
+
+networkPolicy:
+  enabled: true
+  enableHTTPIngressVisibility: true
+  enableKafkaIngressVisibility: false
+  enableHTTPEgressVisibility: false
+  enableKafkaEgressVisibility: true
+
+debug: false
+
+tracing:
+  enabled: false
+  otlpExporterEnabled: true
+  otlpExporterHTTPEndpoint: http://$(HOST_IP):4318
+  otlpExporterGRPCEndpoint: http://$(HOST_IP):4317
+  logSpans: false
+
+recruiter:
+  image:
+    repository: quay.io/isovalent/jobs-app-recruiter
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1
+  ingress:
+    enabled: false
+    host: ~
+    pathType: ~
+    className: ~
+    tls:
+      enabled: false
+      secretName: ~
+
+jobposting:
+  image:
+    repository: quay.io/isovalent/jobs-app-jobposting
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1
+  ingress:
+    enabled: false
+    host: ~
+    pathType: ~
+    className: ~
+    tls:
+      enabled: false
+      secretName: ~
+
+coreapi:
+  image:
+    repository: quay.io/isovalent/jobs-app-coreapi
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1
+  # how often the API should return errors
+  errorRate: '0.1'
+  # how often the API should delay requests with a sleep
+  sleepRate: '0.0'
+  # lower bound on how long to sleep
+  sleepLowerBound: '0.0'
+  # upper bound on how long to sleep. Can set upper bound only to get a
+  # constant delay.
+  sleepUpperBound: '0.0'
+  ingress:
+    enabled: false
+    host: ~
+    pathType: ~
+    className: ~
+    tls:
+      enabled: false
+      secretName: ~
+
+crawler:
+  image:
+    repository: quay.io/isovalent/jobs-app-crawler
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1
+  crawlFrequencyLowerBound: 0.500
+  crawlFrequencyUpperBound: 5
+  http:
+    # enable http queries to a given url every crawl tick.
+    enabled: true
+    # url must be defined when http is enabled, and start with either http://
+    # or https://.
+    url: 'http://api.github.com'
+  revshell:
+    # enable a simulation of application compromise. When enabled, the crawler
+    # will spawn a netcat command to the revshell.uri after revshell.delay to
+    # generate suspicious activity.
+    enabled: false
+    # target hostname queried by netcat
+    host: "29ed272d6f0b5f81617b506732b403fe.not-reverse-shell.com"
+    # target port queried by netcat
+    port: 443
+    # count of seconds after which the reverse shell is spawned, default to 5
+    # minutes.
+    delay: 300
+
+resumes:
+  image:
+    repository: quay.io/isovalent/jobs-app-resumes
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1
+
+loader:
+  image:
+    repository: quay.io/isovalent/jobs-app-loader
+    override:
+    tag: "v0.9.1"
+    useDigest: false
+    digest: ~
+  replicas: 1

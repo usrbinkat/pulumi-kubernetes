@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: 0.9.1
+dependencies:
+- condition: strimzi-kafka-operator.enabled
+  name: strimzi-kafka-operator
+  repository: https://strimzi.io/charts
+  version: 0.38.0
+- condition: elasticsearch.enabled
+  name: elasticsearch
+  repository: https://helm.elastic.co
+  version: 7.17.3
+description: A Helm chart for Kubernetes
+name: jobs-app
+type: application
+version: 0.9.1
