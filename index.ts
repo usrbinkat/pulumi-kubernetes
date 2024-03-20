@@ -12,7 +12,7 @@ const config = new pulumi.Config();
 // Get the kubeconfig context from the Pulumi configuration
 // If none is specified, use the default "kind-cilium" context
 // - pulumi config set kubeconfig.context $KUBECONFIG_CONTEXT_NAME
-const context = config.get("kubeconfig.context") || "kind-cilium";
+const context = config.get("kubeconfig.context") || "kind-pulumi";
 
 // Create a Kubernetes provider instance that uses the context from the local kubeconfig file.
 const k8sProvider = new k8s.Provider("k8sProvider", {
@@ -36,20 +36,22 @@ const ciliumHelmValues = {
     tunnelProtocol: "vxlan",
     k8sServiceHost: serverIPs[0],
     kubeProxyReplacement: "strict",
-//  This value should be set to the cidr to exclude with nat. the podCidr.
-//  Leave this value default unless you know what you are about. 
-//  nativeRoutingCIDR: "10.2.0.0/16",
+    //  This value should be set to the cidr to exclude with nat. the podCidr.
+    //  Leave this value default unless you know what you are about.
+    //  nativeRoutingCIDR: "10.2.0.0/16",
     image: { pullPolicy: "IfNotPresent" },
     hostServices: { enabled: false },
-    cluster: { name: "kind-cilium" },
+    cluster: { name: "kind-pulumi" },
     externalIPs: { enabled: true },
     gatewayAPI: { enabled: false },
-    hubble: { 
-      enabled: true,
-      relay: {
-        enabled: true },
-      ui: {
-        enabled: true },
+    hubble: {
+        enabled: true,
+        relay: {
+            enabled: true
+        },
+        ui: {
+            enabled: true
+        },
     },
     ipam: { mode: "kubernetes" },
     nodePort: { enabled: true },
@@ -65,7 +67,7 @@ const ciliumHelmValues = {
 const ciliumHelmRelease = new k8s.helm.v3.Release("cilium-release", {
     chart: "cilium",
     name: "cilium", // This is the name of the Helm Release and is an arbitrary string
-    repositoryOpts: {repo: "https://helm.cilium.io/"},
+    repositoryOpts: { repo: "https://helm.cilium.io/" },
     version: "1.14.5",
     values: ciliumHelmValues,
     namespace: ciliumHelmValues.namespace,
@@ -94,95 +96,26 @@ const ciliumOperatorDeploymentStatus = ciliumOperatorDeployment.status.apply(sta
 });
 
 // Deploy Helm Chart for Jobs App.
-
 const JobsAppHelmValues = {
-  namespace: "jobs-app",
-  networkPolicy: {
-    enabled: true,
-    enableHTTPIngressVisibility: true,
-    enableKafkaIngressVisibility: false,
-    enableHTTPEgressVisibility: false,
-    enableKafkaEgressVisibility: true,
-  }
+    namespace: "jobs-app",
+    networkPolicy: {
+        enabled: true,
+        enableHTTPIngressVisibility: true,
+        enableKafkaIngressVisibility: false,
+        enableHTTPEgressVisibility: false,
+        enableKafkaEgressVisibility: true,
+    }
 }
 const JobsAppHelmRelease = new k8s.helm.v3.Release("jobs-app", {
-  chart: "./charts/jobs-app",
-  values: JobsAppHelmValues,
-  namespace: JobsAppHelmValues.namespace,
-  waitForJobs: true,
-  lint: true,
-  skipAwait: false,
-  createNamespace: true,
-  skipCrds: false
+    chart: "./charts/jobs-app",
+    values: JobsAppHelmValues,
+    namespace: JobsAppHelmValues.namespace,
+    waitForJobs: true,
+    lint: true,
+    skipAwait: false,
+    createNamespace: true,
+    skipCrds: false
 }, { provider: k8sProvider, dependsOn: ciliumHelmRelease });
-
-
-
-
-
-// Deploy the Cilium demo application using the YAML file from GitHub.
-//const demoApp = new k8s.yaml.ConfigFile("http-sw-app", {
-//    // deploy this app into the namespace `default`
-//    transformations: [
-//        (obj: any) => {
-//            if (obj.metadata) {
-//                obj.metadata.namespace = "default";
-//            }
-//        },
-//    ],
-//    file: "https://raw.githubusercontent.com/cilium/cilium/HEAD/examples/minikube/http-sw-app.yaml",
-//    resourcePrefix: "deathstar",
-//});
-//
-//// A variable indicating whether the policy should be strict
-//const policyStrict: boolean = true;
-//let ciliumNetworkPolicy: k8s.apiextensions.CustomResource | undefined;
-//
-//if (policyStrict) {
-//    // Define the CiliumNetworkPolicy
-//    const ciliumNetworkPolicy = new k8s.apiextensions.CustomResource("rule1", {
-//        apiVersion: "cilium.io/v2",
-//        kind: "CiliumNetworkPolicy",
-//        metadata: {
-//            name: "rule1",
-//            namespace: "default",
-//        },
-//        spec: {
-//            description: "L3-L4 policy to restrict deathstar access to empire ships only",
-//            endpointSelector: {
-//                matchLabels: {
-//                    org: "empire",
-//                    class: "deathstar",
-//                },
-//            },
-//            ingress: [
-//                {
-//                    fromEndpoints: [
-//                        {
-//                            matchLabels: {
-//                                org: "empire",
-//                            },
-//                        },
-//                    ],
-//                    toPorts: [
-//                        {
-//                            ports: [
-//                                {
-//                                    port: "80",
-//                                    protocol: "TCP",
-//                                },
-//                            ],
-//                        },
-//                    ],
-//                },
-//            ],
-//        },
-//    });
-//}
-
-// Export the name of the CiliumNetworkPolicy
-//export const policyName = ciliumNetworkPolicy?.metadata.apply(m => m.name);
-//export const appName = demoApp.metadata.apply(m => m.name);
 
 // Export the Cilium Helm Release Resources
 export const outputs = {
