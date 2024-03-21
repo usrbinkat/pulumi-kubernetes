@@ -9,3 +9,5 @@
 .pulumi/*
 .env*
 Pulumi.*.yaml
+*.pyc
+venv/

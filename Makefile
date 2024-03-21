@@ -1,5 +1,5 @@
 # --- Global Variables ---
-DEPLOYMENT_ENVIRONMENT := dev
+DEPLOYMENT_ENVIRONMENT := kind
 LOWERCASE_GITHUB_REPOSITORY := $(shell echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')
 REPO_NAME := $(shell echo ${LOWERCASE_GITHUB_REPOSITORY} | awk -F '/' '{print $$2}')
 REPO_ORG := $(shell echo ${LOWERCASE_GITHUB_REPOSITORY} | awk -F '/' '{print $$1}')

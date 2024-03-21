@@ -1,3 +1,14 @@
-name: cilium-kubernetes
-runtime: nodejs
-description: pulumi deploy cilium on kubernetes
+name: pulumi-kubernetes
+description: Tricks with Pulumi IaC demonstrated on Kubernetes
+main: .
+stackConfigDir: stacks/
+options:
+  refresh: always
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: kubernetes-python

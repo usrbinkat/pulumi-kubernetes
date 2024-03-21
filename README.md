@@ -1,33 +1,54 @@
-# Cilium + Kubernetes + Pulumi
+# Pulumi + Kubernetes
 
-[![License](https://img.shields.io/github/license/usrbinkat/iac-mesh-pac)]() [![Pulumi](https://img.shields.io/badge/pulumi-v3.101.1-blueviolet)](https://www.pulumi.com/docs/get-started/install/) [![Cilium](https://img.shields.io/badge/cilium-v1.14.5-blueviolet)](https://docs.cilium.io/en/v1.9/gettingstarted/kind/) [![kubectl](https://img.shields.io/badge/kubectl-v1.29.0-blueviolet)](https://kubernetes.io/docs/tasks/tools/install-kubectl/) [![Docker](https://img.shields.io/badge/docker-v24.0.7-blueviolet)](https://docs.docker.com/get-docker/) [![Kind](https://img.shields.io/badge/kind-v0.20.0-blueviolet)](https://kind.sigs.k8s.io/docs/user/quick-start/) [![Helm](https://img.shields.io/badge/helm-v3.13.3-blueviolet)](https://helm.sh/docs/intro/install/)
+[![CI - Cilium on Kind](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml/badge.svg)](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml) [![License](https://img.shields.io/github/license/usrbinkat/iac-mesh-pac)]() [![Pulumi](https://img.shields.io/badge/pulumi-v3.101.1-blueviolet)](https://www.pulumi.com/docs/get-started/install/) [![Cilium](https://img.shields.io/badge/cilium-v1.14.5-blueviolet)](https://docs.cilium.io/en/v1.9/gettingstarted/kind/) [![kubectl](https://img.shields.io/badge/kubectl-v1.29.0-blueviolet)](https://kubernetes.io/docs/tasks/tools/install-kubectl/) [![Docker](https://img.shields.io/badge/docker-v24.0.7-blueviolet)](https://docs.docker.com/get-docker/) [![Kind](https://img.shields.io/badge/kind-v0.20.0-blueviolet)](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/usrbinkat/cilium-kubernetes)
 
-[![CI - Cilium on Kind](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml/badge.svg)](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml)
+## Index
+- [Infrastructure as Code](#infrastructure-as-code)
+  - [Overview](#overview)
+  - [How To](#how-to)
+    - [1. Create Kind Kubernetes Cluster](#1-create-kind-kubernetes-cluster)
+    - [2. Deploy Cilium and Cilium Network Policy](#2-deploy-cilium-and-cilium-network-policy)
+    - [3. Check pods and labels](#3-check-pods-and-labels)
+    - [4. Test Cilium Network Policy](#4-test-cilium-network-policy)
+    - [5. Cleanup](#4-cleanup)
+  - [Repo Tree](#repo-tree)
 
-## DevOps & Network Policy as Code
+## Infrastructure as Code
 
-This repository contains an implementation of the [Cilium Network Policy](https://docs.cilium.io/en/v1.9/gettingstarted/kind/#deploy-cilium) demo powered by Pulumi's Typescript [Infrastructure as Code](https://www.pulumi.com/what-is/what-is-infrastructure-as-code) (IaC). The demo showcases the deployment and validation of network policy enforcement.
+### Overview
 
-[Cilium](https://cilium.io/) is an open-source project that provides networking and security for applications running on Kubernetes. It offers enhanced network visibility, load balancing, and network security features.
+This repository contains a [Python] infrastructure as code (IaC) project that deploys a collection of Kubernetes resources to a local [KinD](https://kind.sigs.k8s.io/) cluster. The project demonstrates a number of features and workflows, including:
 
-[Pulumi](https://www.pulumi.com/) is an open-source infrastructure as code tool that allows you to define, deploy, and manage cloud infrastructure using familiar programming languages. It provides a consistent and programmable way to provision and manage resources across different cloud providers.
+- **[Python]**: Python is a popular programming language that is widely used for general purpose scripting and programming. It is known for its simplicity and readability, and is widely used in the AI and DevOps communities.
+- **[Pulumi]**: Pulumi is an open-source infrastructure as code tool that allows you to define, deploy, and manage cloud infrastructure using familiar programming languages. It provides a consistent and programmable way to provision and manage resources across different cloud providers.
+- **[KinD] (Kubernetes-in-Docker)**: KinD is a tool for running local Kubernetes clusters using Docker container "nodes". It allows you to create and manage Kubernetes clusters for development and testing purposes.
+- **[Cilium]**: Cilium is an open-source project that provides networking and security for applications running on Kubernetes. It offers enhanced network visibility, load balancing, and network security features.
+- **[Cert-Manager]**: Cert-Manager is a Kubernetes add-on to automate the management and issuance of TLS certificates from various issuing sources.
+- **[Kubevirt]**: KubeVirt is a virtualization add-on for Kubernetes that allows you to run virtual machines alongside your container workloads in Kubernetes.
+- **[Containerized Data Importer]**: The Containerized Data Importer (CDI) is a Kubernetes add-on that allows you to import and prepare VM images for use with KubeVirt.
 
-[KinD (Kubernetes-in-Docker)](https://kind.sigs.k8s.io/) is a tool for running local Kubernetes clusters using Docker container "nodes". It allows you to create and manage Kubernetes clusters for development and testing purposes.
-
-In this demo, we are using Pulumi, Kind Kubernetes, and Cilium to showcase how to deploy and manage a Kubernetes cluster and enhanced networking and security features with IaC.
+[Cilium]:https://cilium.io
+[Pulumi]:https://www.pulumi.com
+[Kind]:https://kind.sigs.k8s.io
+[Kubevirt]:https://kubevirt.io
+[Cert-Manager]:https://cert-manager.io
+[Containerized Data Importer]:https://kubevirt.io/user-guide/operations/containerized_data_importer
+[Python]:https://www.python.org
 
 ### How To
 
 To try the Cilium Network Policy demo, follow these steps:
 
-0. [Open this project in GitHub Codespaces](https://codespaces.new/usrbinkat/cilium-kubernetes)
-1. Create Kind Kubernetes Cluster
-2. Deploy Cilium
-3. Deploy Cilium Network Policy
-4. Test Cilium Network Policy
-5. Cleanup
+1. [Open this project in GitHub Codespaces](https://codespaces.new/usrbinkat/cilium-kubernetes)
+2. Login to Pulumi Cloud
+3. Create Pulumi ESC Environment
+4. Create Kind Kubernetes Cluster
+5. Deploy Pulumi IaC
+6. Add VM Count integer config
+7. Pulumi UP to build VMs
+8. Cleanup
 
 #### 1. Create Kind Kubernetes Cluster
 
@@ -42,37 +63,13 @@ make kind
 pulumi login && pulumi install
 
 # Pulumi Create/Select Stack
-pulumi stack select --create $GITHUB_USER/cilium-kubernetes/dev
+pulumi stack select --create $GITHUB_USER/pulumi-kubernetes/kind
 
 # Pulumi Deploy Stack
 pulumi up
 ```
 
-### 3. Check pods and labels
-
-The network policy is enforced by matching policies to pods based on their labels. The `tiefighter` pod has the label `app=starwars` and the `xwing` pod has the label `app=starwars` and `role=xwing`.
-
-```bash
-# Check that the pods are running & have appropriate labels
-kubectl get pods --show-labels
-```
-
-![kubectl get po --show-labels](.github/assets/kubectl-get-po-show-labels.png)
-
-### 4. Test Cilium Network Policy
-
-We will use curl to test the network policy. The `tiefighter` pod is compliant with the policy and the `xwing` pod is non-compliant. The `tiefighter` pod should be able to access the `deathstar` and return `Ship landed`, while the `xwing` pod will fail to respond due to traffic policy denying the traffic.
-
-```bash
-# Curl policy compliant
-kubectl exec tiefighter -- curl -s -XPOST deathstar.default.svc.cluster.local/v1/request-landing
-
-# Curl policy non-compliant
-kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing
-```
-![kubectl exec xwing -- curl -vs -XPOST deathstar.default.svc.cluster.local/v1/request-landing](.github/assets/kubectl-exec-xwing.png)
-
-#### 4. Cleanup
+#### 3. Cleanup
 
 ```bash
 # Pulumi Destroy Stack & Delete Kind Cluster
@@ -90,76 +87,47 @@ make stop
 > Index of important files in this project.
 >
 > ```bash
-> cilium-kubernetes on  main [!] via  v20.11.0 via  usrbinkat@dev
-> 🐋 ❯ tree -a -I .git -I .devcontainer -I node_modules
+> 🐋 ❯ tree -a -I .git -I .devcontainer -I charts -I hack -I __pycache__ -I venv -I .git -I .pulumi
 > .
-> ├── README.md                # Overview and documentation for the project
-> ├── index.ts                 # Main TypeScript file for Pulumi
-> ├── Pulumi.yaml              # Pulumi project configuration file
-> ├── tsconfig.json            # TypeScript configuration file
-> ├── Makefile                 # Makefile for automating setup and deployment
-> ├── hack                     # Directory of dev scripts and configurations
-> │   └── kind.yaml            # KinD cluster configuration file
-> │
-> ├── LICENSE                  # License file for the project
-> ├── package.json             # NPM package configuration file
-> ├── package-lock.json        # NPM package lock file
-> │
-> ├── .envrc                   # Direnv configuration file
-> ├── .gitignore               # Specifies intentionally untracked files to ignore
-> ├── .gitmodules              # Git Submodule configuration file
-> ├── .github
-> │   ├── konductor            # Git submodule for GitHub Codespaces Devcontainer
-> │   └── workflows/ci.yaml    # Github Actions Runner CI workflow
-> ├── .kube                    # Kubernetes configuration directory
-> │   └── config               # Kubernetes credentials file (gitignored)
-> └── .pulumi                  # Pulumi configuration and state files
->     └── credentials.json     # Pulumi credentials (gitignored)
+> ├── README.md                        # Overview and documentation for the project
+> ├── requirements.txt                 # Python dependencies for Pulumi and other Python tools used in the project
+> ├── Pulumi.yaml                      # Main Pulumi project configuration file
+> ├── Pulumi.pulumi-kubernetes.yaml    # Pulumi stack configuration specific to the pulumi-kubernetes plugin
+> ├── __main__.py                      # Main Pulumi program file, entry point for Pulumi deployments
+> ├── Makefile                         # Makefile for automating common tasks and commands
+> ├── src                              # Source directory for the Pulumi components/modules
+> │   ├── cdi                          # Component directory for Containerized Data Importer (CDI) deployments
+> │   │   ├── deploy.py                # Deployment script for CDI
+> │   │   └── __init__.py              # Makes Python treat the directories as containing packages
+> │   ├── cert_manager                 # Component directory for Cert-Manager deployments
+> │   │   ├── deploy.py                # Deployment script for Cert-Manager
+> │   │   └── __init__.py              # Makes Python treat the directories as containing packages
+> │   ├── cilium                       # Component directory for Cilium network policies deployments
+> │   │   ├── deploy.py                # Deployment script for Cilium
+> │   │   └── __init__.py              # Makes Python treat the directories as containing packages
+> │   ├── kubevirt                     # Component directory for KubeVirt deployments
+> │   │   ├── deploy.py                # Deployment script for KubeVirt
+> │   │   └── __init__.py              # Makes Python treat the directories as containing packages
+> │   └── lib                          # Library directory for shared scripts and utilities
+> │       ├── helm_release_latest.py   # Utility script for deploying the latest Helm releases
+> │       └── __init__.py              # Makes Python treat the directories as containing packages
+> ├── LICENSE                          # License file for the project
+> ├── .envrc                           # Environment configuration, typically for direnv to load environment variables
+> ├── .github                          # Contains GitHub related configurations and workflows
+> │   ├── assets                       # Assets for GitHub repository, like images for README.md
+> │   ├── konductor                    # ghcr.io/pulumi/devcontainer based Devcontainer image for project
+> │   └── workflows                    # GitHub Actions workflows
+> │       └── ci.yaml                  # Continuous Integration workflow configuration for GitHub Actions
+> ├── .gitignore                       # Specifies intentionally untracked files to ignore by Git
+> ├── .gitmodules                      # Git Submodules configuration file
+> ├── .kube                            # Kubernetes configuration directory
+> │   ├── config                       # Kubernetes cluster connection and authentication information
+> │   └── .gitkeep                     # Placeholder to keep the .kube directory in Git despite being empty
+> └── .talos                           # Directory potentially for Talos OS configuration or related files
+>     └── .gitkeep                     # Placeholder to keep the .talos directory in Git despite being empty
 >
-> 6 directories, 24 files
+> 8 directories, 20 files
 > ```
-
-## Alternative manual steps
-
-<details>
-
-```bash
-########################################################################
-# Create Kind Cluster
-kind create --config hack/kind.yaml
-
-# Add cilium helm repo
-helm repo add cilium https://helm.cilium.io
-
-# Deploy cilium
-helm upgrade --install cilium cilium/cilium --namespace kube-system --version 1.14.5 --values hack/cilium.yaml
-
-# cilium status
-cilium status --wait --wait-duration 2m0s
-
-########################################################################
-# Starwars Empire vs Rebels Demo App
-# https://docs.solo.io/gloo-network/main/quickstart/#policy
-
-export CILIUM_VERSION=1.14.5
-kubectl create ns starwars
-kubectl -n starwars apply -f https://raw.githubusercontent.com/cilium/cilium/$CILIUM_VERSION/examples/minikube/http-sw-app.yaml
-
-# Apply policy
-kubectl apply -f hack/ciliumnetpol.yaml
-kubectl get ciliumnetworkpolicy
-
-# Curl policy compliant
-kubectl exec tiefighter -n starwars -- curl -s -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
-
-# Curl policy non-compliant
-kubectl exec xwing -n starwars -- curl -s -XPOST deathstar.starwars.svc.cluster.local/v1/request-landing
-
-# check labels
-kubectl get pods -n starwars --show-labels
-```
-
-</details>
 
 ## Contributing
 
