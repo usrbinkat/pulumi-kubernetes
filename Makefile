@@ -150,7 +150,7 @@ kind-cluster:
 	@sudo docker volume create pulumi-worker-n01
 	@sudo docker volume create pulumi-worker-n02
 	@sudo docker volume create pulumi-control-plane-n01
-	@sudo kind create cluster --config=hack/kind.yaml
+	@sudo kind create cluster --config=.github/hack/kind.yaml
 	@sudo kind get clusters
 	@sudo kind get kubeconfig --name pulumi | tee ${KUBE_CONFIG_FILE} 1>/dev/null
 	@sudo kind get kubeconfig --name pulumi | tee ${HOME}/.kube/config 1>/dev/null

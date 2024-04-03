@@ -15,7 +15,7 @@ def is_stable_version(version_str):
     except InvalidVersion:
         return False
 
-def get_latest_helm_chart_version(url, chart_name):
+def get_latest(url, chart_name):
     """
     Fetches the latest stable version of a Helm chart from a given URL.
 
@@ -57,5 +57,5 @@ def get_latest_helm_chart_version(url, chart_name):
 # Example usage
 url = "https://raw.githubusercontent.com/cilium/charts/master/index.yaml"
 chart = "cilium"
-latest_version = get_latest_helm_chart_version(url, chart)
+latest_version = get_latest(url, chart)
 print(f"The latest version of {chart} is: {latest_version}")
