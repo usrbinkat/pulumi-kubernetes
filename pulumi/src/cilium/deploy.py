@@ -1,6 +1,6 @@
 import pulumi
 import pulumi_kubernetes as k8s
-from lib import helm_release_latest
+from lib.helm_release_latest import get_latest as helm_release_latest
 
 def deploy_cilium(
         k8s_provider,
@@ -17,22 +17,22 @@ def deploy_cilium(
     cilium_latest_version = "1.14.7"
 
     # Determine Helm values based on the Kubernetes distribution
-    helm_values = get_helm_values(kubernetes_distribution, k8s_endpoint_ip)
+    helm_values = helm_release_latest(kubernetes_distribution, k8s_endpoint_ip)
 
     # Deploy Helm Chart for Cilium
     cilium_helm_release = k8s.helm.v3.Release(
         "cilium-release",
         chart="cilium",
-        repository_opts={"repo": "https://helm.cilium.io/"},
-        version=cilium_latest_version,
         values=helm_values,
+        version=cilium_latest_version,
+        repository_opts={"repo": "https://helm.cilium.io/"},
         namespace="kube-system",
-        wait_for_jobs=True,
-        skip_await=False,
-        skip_crds=False,
         opts=pulumi.ResourceOptions(
             provider=k8s_provider
-        )
+        ),
+        wait_for_jobs=True,
+        skip_await=False,
+        skip_crds=False
     )
 
     return cilium_helm_release

@@ -108,21 +108,36 @@ talos-gen-config:
 	@touch ${HOME}/.kube/config ${KUBE_CONFIG_FILE} ${TALOS_CONFIG_FILE}
 	@chmod 600 ${HOME}/.kube/config ${KUBE_CONFIG_FILE} ${TALOS_CONFIG_FILE}
 	@sudo talosctl gen config kargo https://10.5.0.2:6443 \
-		--config-patch @.talos/patch/machine.yaml --output .talos/manifest
+		--config-patch @.talos/patch/machine.yaml --force --output .talos/manifest
 	@sudo talosctl validate --mode container \
 		--config .talos/manifest/controlplane.yaml
 	@echo "Talos Config generated."
 
-# --- Talos Cluster ---
-talos-cluster: detect-arch talos-gen-config
-	@echo "Creating Talos Kubernetes Cluster..."
-	@sudo talosctl cluster create \
-		--arch=$$(make detect-arch) \
+# --- Talos Cluster in Docker ---
+talos-cluster-docker:
+	@echo "Creating Talos Kubernetes Cluster in Docker..."
+	@ARCH=$$(uname -m | awk '{ if ($$1 == "x86_64") print "amd64"; else if ($$1 == "aarch64" || $$1 == "arm64") print "arm64"; else print "unknown" }'); \
+	set -ex; direnv allow; \
+	talosctl cluster create \
+		--arch=$$ARCH \
 		--workers 1 \
 		--controlplanes 1 \
-		--provisioner docker
+		--provisioner docker; echo "Talos Cluster created."
 	@pulumi config set kubernetes talos || true
-	@echo "Talos Cluster provisioning..."
+	@echo "Talos Cluster provisioning in Docker..."
+
+# --- Talos Cluster in Docker ---
+talos-cluster-qemu:
+	@echo "Creating Talos Kubernetes Cluster in QEMU..."
+	@ARCH=$$(uname -m | awk '{ if ($$1 == "x86_64") print "amd64"; else if ($$1 == "aarch64" || $$1 == "arm64") print "arm64"; else print "unknown" }'); \
+	set -ex; direnv allow; \
+	sudo -E talosctl cluster create \
+		--arch=$$ARCH \
+		--workers 1 \
+		--controlplanes 1 \
+		--provisioner docker; echo "Talos Cluster created."
+	@pulumi config set kubernetes talos || true
+	@echo "Talos Cluster provisioning in QEMU..."
 
 # --- Wait for Talos Cluster Ready ---
 talos-ready:
@@ -132,8 +147,17 @@ talos-ready:
 	@bash -c 'until kubectl --kubeconfig ${KUBE_CONFIG_FILE} wait --for=condition=Ready pod -l k8s-app=kube-apiserver --namespace=kube-system --timeout=180s; do echo "Waiting for kube-apiserver to be ready..."; sleep 5; done'
 	@echo "Talos Cluster is ready."
 
+# --- Talos Cluster Clenup ---
+talos-clean:
+	@echo "Cleaning up Talos Cluster..."
+	sudo talosctl cluster destroy --force --cluster talos-default
+	sudo talosctl config remove --noconfirm talos-default
+	sudo rm -rf /home/vscode/.talos/clusters
+	sudo echo > ${TALOS_CONFIG_FILE}
+	@echo "Talos Cluster cleaned up."
+
 # --- Talos ---
-talos: clean-all talos-cluster talos-ready wait-all-pods
+talos: talos-gen-config talos-cluster talos-ready wait-all-pods
 	@echo "Talos Cluster ready."
 
 # ----------------------------------------------------------------------------------------------

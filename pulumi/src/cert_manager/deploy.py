@@ -1,10 +1,9 @@
 import pulumi
-from pulumi_kubernetes import helm, Provider
 import pulumi_kubernetes as k8s
 from pulumi_kubernetes.apiextensions.CustomResource import CustomResource
-from ...lib.helm_chart_versions import get_latest_helm_chart_version
+from lib.helm_release_latest import get_latest as get_helm_latest
 
-def deploy_cert_manager(name: str, k8s_provider: Provider, kubernetes_distribution: str, project_name: str, namespace: str):
+def deploy_cert_manager(name: str, k8s_provider: k8s.Provider, kubernetes_distribution: str, project_name: str, namespace: str):
     # Create a Namespace
     cert_manager_namespace = k8s.core.v1.Namespace("cert_manager_namespace",
         metadata= k8s.meta.v1.ObjectMetaArgs(
@@ -26,7 +25,7 @@ def deploy_cert_manager(name: str, k8s_provider: Provider, kubernetes_distributi
     chart_index_path = "index.yaml"
     chart_url = "https://charts.jetstack.io"
     index_url = f"{chart_url}/{chart_index_path}"
-    chart_version = get_latest_helm_chart_version(index_url, chart_name)
+    chart_version = get_helm_latest(index_url, chart_name)
 
     # Deploy cert-manager using the Helm release with updated custom values
     helm_values = gen_helm_values(kubernetes_distribution, project_name)
