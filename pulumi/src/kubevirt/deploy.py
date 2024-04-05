@@ -1,6 +1,8 @@
 import pulumi
 import requests
 import pulumi_kubernetes as k8s
+from pulumi_kubernetes.apiextensions import CustomResource
+from pulumi_kubernetes.meta.v1 import ObjectMetaArgs
 
 def deploy_kubevirt(
         namespace: str,
@@ -17,55 +19,57 @@ def deploy_kubevirt(
         version = requests.get(url_kubevirt_releases_stable).text.strip()
 
     # Deploy the KubeVirt operator
-    kubevirt_operator_url = f'https://github.com/kubevirt/kubevirt/releases/download/{version}/kubevirt-operator.yaml'
+    url = f'https://github.com/kubevirt/kubevirt/releases/download/{version}/kubevirt-operator.yaml'
     kubevirt_operator = k8s.yaml.ConfigFile(
         'kubevirt-operator',
-        file=kubevirt_operator_url,
+        file=url,
         opts=pulumi.ResourceOptions(
             provider=k8s_provider,
             depends_on=[depends]
         )
     )
 
-    # Set useEmulation 'True' if kubernetes_distribution is Kind else false.
-    use_emulation = kubernetes_distribution == 'kind'
+    kubevirt_custom_resource_spec = {
+        "customizeComponents": {},
+        "workloadUpdateStrategy": {},
+        "certificateRotateStrategy": {},
+        "imagePullPolicy": "IfNotPresent",
+        "configuration": {
+            "smbios": {
+                "sku": "kargo-kc2",
+                "version": version,
+                "manufacturer": "ContainerCraft",
+                "product": "Kargo",
+                "family": "CCIO"
+            },
+            "developerConfiguration": {
+                "useEmulation": kubernetes_distribution == "kind",
+                "featureGates": [
+                    "HostDevices",
+                    "AutoResourceLimitsGate"
+                ]
+            },
+            "permittedHostDevices": {
+                "pciHostDevices": [
+                ]
+            }
+        }
+    }
 
-    # CustomResource for KubeVirt
-    k8s.apiextensions.CustomResource(
-        'kubevirt',
-        api_version='kubevirt.io/v1',
-        kind='KubeVirt',
-        metadata=k8s.meta.v1.ObjectMetaArgs(
-            name='kubevirt',
+    kubevirt = CustomResource(
+        "kubevirt",
+        api_version="kubevirt.io/v1",
+        kind="KubeVirt",
+        metadata=ObjectMetaArgs(
+            name="kubevirt",
             namespace=namespace
         ),
-        spec={
-            'customizeComponents': {},
-            'workloadUpdateStrategy': {},
-            'certificateRotateStrategy': {},
-            'imagePullPolicy': 'IfNotPresent',
-            'configuration': {
-                'smbios': {
-                    'sku': 'kargo',
-                    'version': version,
-                    'manufacturer': 'ContainerCraft',
-                    'product': 'Kargo',
-                    'family': 'kc2'
-                },
-                'developerConfiguration': {
-                    'useEmulation': use_emulation,
-                    'featureGates': [
-                        'HostDevices',
-                        'AutoResourceLimitsGate'
-                    ]
-                },
-                'permittedHostDevices': {
-                    'pciHostDevices': []
-                }
-            }
-        },
-        opts=pulumi.ResourceOptions(provider=k8s_provider, depends_on=[depends])
+        spec=kubevirt_custom_resource_spec,
+        opts=pulumi.ResourceOptions(
+            provider=k8s_provider,
+            depends_on=[depends]
+        )
     )
 
     # Return the version used for the deployment
-    return (version)
+    return version

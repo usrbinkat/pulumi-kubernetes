@@ -147,7 +147,7 @@ def deploy_cert_manager(
         )
     )
 
-    return(version, release)
+    return version, release
 
 def gen_helm_values(kubernetes_distribution: str):
 

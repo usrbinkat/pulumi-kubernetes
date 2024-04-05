@@ -66,6 +66,8 @@ if enabled:
         kubernetes_distribution,
         kubernetes_provider
     )
+else:
+    cilium = (None, None)
 
 # Cert Manager
 # Check pulumi config 'cert_manager.enabled' and deploy if true
@@ -84,6 +86,8 @@ if enabled:
         kubernetes_distribution,
         kubernetes_provider
     )
+else:
+    cert_manager = (None, None)
 
 # Kubevirt
 # Check pulumi config 'kubevirt.enabled' and deploy if true
@@ -104,6 +108,9 @@ if enabled:
         kubernetes_distribution,
         kubernetes_provider
     )
+    pulumi.export('KubeVirt_version', kubevirt)
+else:
+    kubevirt = (None)
 
 # Demo Helm Chart "Jobs App"
 # Get pulumi config jobs_app.enabled boolian
@@ -141,9 +148,9 @@ pulumi.export("kube", kube_json)
 
 # Create a dictionary of deployed resource versions
 version_json = pulumi.Output.all(
-    cilium[0],
-    cert_manager[0],
-    kubevirt[0]
+    cilium[0] or None,
+    cert_manager[0] or None,
+    kubevirt or None
 ).apply(lambda args: json.dumps({
     "cilium": args[0],
     "cert_manager": args[1],

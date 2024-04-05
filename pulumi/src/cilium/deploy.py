@@ -39,7 +39,7 @@ def deploy_cilium(
         skip_crds=False
     )
 
-    return (version, helm_release)
+    return version, helm_release
 
 def get_helm_values(
         kubernetes_distribution: str,
