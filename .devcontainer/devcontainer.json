@@ -9,7 +9,7 @@
     //"workspaceFolder": "/workspaces/konductor",
     "shutdownAction": "stopContainer",
     "securityOpt": ["seccomp=unconfined"],
-    "runArgs": ["--network=host"],
+    "runArgs": ["--network=host", "--device=/dev/kvm"],
     "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
     "features": {"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}},
     "postCreateCommand": "devcontainer-links",
