@@ -1,12 +1,15 @@
 """A Kubernetes Python Pulumi program"""
 # Import python packages
 import os
+import json
 import pulumi
 import pulumi_kubernetes as k8s
 
 # Import python packages from the local src directory
 from cilium.deploy import deploy_cilium
 from jobs_app.deploy import deploy_jobs_app
+from cert_manager.deploy import deploy_cert_manager
+from kubevirt.deploy import deploy_kubevirt
 
 ##################################################################################
 # Load the Pulumi Config
@@ -45,34 +48,107 @@ kubernetes_endpoint = pulumi.Output.from_input(k8s_endpoint.subsets[0].addresses
 ## Deploy Kubernetes Resources
 ##################################################################################
 
-# Cilium Helm Chart
-cilium_release = deploy_cilium(
-    kubernetes_provider,
-    kubernetes_distribution,
-    kubernetes_endpoint
-)
+# Cilium CNI
+# Check pulumi config 'cilium.enabled' and deploy if true
+# Disable Cilium with the following command:
+#   ~$ pulumi config set cilium.enabled false
+# Set Cilium version override with the following command:
+#   ~$ pulumi config set cilium.version v1.14.7
+enabled = config.get_bool('cilium.enabled') or True
+version = config.get('cilium.version') or None
+namespace = "kube-system"
+if enabled:
+    # Deploy Cilium
+    cilium = deploy_cilium(
+        namespace,
+        version,
+        kubernetes_endpoint,
+        kubernetes_distribution,
+        kubernetes_provider
+    )
+
+# Cert Manager
+# Check pulumi config 'cert_manager.enabled' and deploy if true
+# Enable cert-manager with the following command:
+#   ~$ pulumi config set cert_manager.enabled true
+# Set cert-manager version override with the following command:
+#   ~$ pulumi config set cert_manager.version v1.5.3
+enabled = config.get_bool('cert_manager.enabled') or False
+version = config.get('cert_manager.version') or None
+namespace = "cert-manager"
+if enabled:
+    # Deploy cert-manager
+    cert_manager = deploy_cert_manager(
+        namespace,
+        version,
+        kubernetes_distribution,
+        kubernetes_provider
+    )
+
+# Kubevirt
+# Check pulumi config 'kubevirt.enabled' and deploy if true
+# Enable Kubevirt with the following command:
+#   ~$ pulumi config set kubevirt.enabled true
+# Set Kubevirt version override with the following command:
+#   ~$ pulumi config set kubevirt.version v0.46.0
+enabled = config.get_bool('kubevirt.enabled') or False
+version = config.get('kubevirt.version') or None
+namespace = "kubevirt"
+depends = cert_manager[1]
+if enabled:
+    # Deploy KubeVirt
+    kubevirt = deploy_kubevirt(
+        namespace,
+        version,
+        depends,
+        kubernetes_distribution,
+        kubernetes_provider
+    )
 
 # Demo Helm Chart "Jobs App"
 # Get pulumi config jobs_app.enabled boolian
-if config.get_bool("jobs_app.enabled"):
+# ~$ pulumi config set jobs_app.enabled true
+enabled = config.get_bool('jobs_app.enabled') or False
+if enabled:
     # If bool true, deploy the Jobs App Helm Chart
     jobs_app = deploy_jobs_app(
         kubernetes_provider,
-        cilium_release
+        cilium
     )
 
 ##################################################################################
 ## Export Stack Outputs
 ##################################################################################
 
-# Export the Kubernetes configuration values
-kube = {
-    "kubernetes_dist": kubernetes_distribution,
-    "kubernetes_config":  kubernetes_config,
-    "kubernetes_context": kubernetes_context,
-    "kubernetes_endpoint": kubernetes_endpoint
-}
-pulumi.export("kubernetes", kube)
-
 # Export the kubernetes_provider securely as a secret for use in other stacks
-pulumi.export("kubernetes_provider", kubernetes_provider.context)
+pulumi.export("kubernetes_provider", kubernetes_provider)
+
+# Use pulumi.Output.all() to aggregate all Output values and then construct the dictionary
+kube_json = pulumi.Output.all(
+    kubernetes_distribution,
+    kubernetes_config,
+    kubernetes_context,
+    kubernetes_endpoint
+).apply(lambda args: json.dumps({"kubernetes": {
+    "dist": args[0],
+    "config": args[1],
+    "context": args[2],
+    "endpoint": args[3]
+}}, default=str))
+
+# Export the 'kube' dictionary as a stack output in json format
+pulumi.export("kube", kube_json)
+
+# Create a dictionary of deployed resource versions
+version_json = pulumi.Output.all(
+    cilium[0],
+    cert_manager[0],
+    kubevirt[0]
+).apply(lambda args: json.dumps({
+    "cilium": args[0],
+    "cert_manager": args[1],
+    "kubevirt": args[2]
+}, default=str))
+
+# Export the 'version' dictionary as a stack output in json format
+pulumi.export("version", version_json)
