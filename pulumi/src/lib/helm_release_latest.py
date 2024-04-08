@@ -3,12 +3,7 @@ import logging
 import yaml
 from packaging.version import parse as parse_version, InvalidVersion, Version
 
-# Set up basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-# Filter for stable versions (no pre-release or dev metadata)
 def is_stable_version(version_str):
-    """Check if the version string is a valid and stable semantic version."""
     try:
         parsed_version = parse_version(version_str)
         return isinstance(parsed_version, Version) and not parsed_version.is_prerelease and not parsed_version.is_devrelease
@@ -16,20 +11,6 @@ def is_stable_version(version_str):
         return False
 
 def get_latest(url, chart_name):
-    """
-    Fetches the latest stable version of a Helm chart from a given URL.
-
-    Args:
-        url (str): The URL of the Helm chart repository.
-        chart_name (str): The name of the Helm chart.
-
-    Returns:
-        str: The latest stable version of the Helm chart, or an error message if the chart is not found or an error occurs during fetching.
-
-    Raises:
-        requests.RequestException: If an error occurs during the HTTP request.
-
-    """
     try:
         logging.info(f"Fetching URL: {url}")
         response = requests.get(url)
@@ -39,6 +20,7 @@ def get_latest(url, chart_name):
         index = yaml.safe_load(response.content)
         if chart_name in index['entries']:
             chart_versions = index['entries'][chart_name]
+
             # Filter out non-stable versions and sort
             stable_versions = [v for v in chart_versions if is_stable_version(v['version'])]
             if not stable_versions:
@@ -54,8 +36,8 @@ def get_latest(url, chart_name):
         logging.error(f"Error fetching data: {e}")
         return f"Error fetching data: {e}"
 
-# Example usage
-url = "https://raw.githubusercontent.com/cilium/charts/master/index.yaml"
-chart = "cilium"
-latest_version = get_latest(url, chart)
-print(f"The latest version of {chart} is: {latest_version}")
+## Example usage
+# url = "https://raw.githubusercontent.com/cilium/charts/master/index.yaml"
+# chart = "cilium"
+# latest_version = get_latest(url, chart)
+# print(f"The latest version of {chart} is: {latest_version}")
