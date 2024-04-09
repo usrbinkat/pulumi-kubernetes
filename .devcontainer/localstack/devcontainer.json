@@ -19,8 +19,7 @@
         "source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
     ],
     "features": {
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-        "ghcr.io/devcontainers-contrib/features/localstack:2": {}
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
     },
     "postCreateCommand": "devcontainer-links",
     //"workspaceMount": "source=.,target=/home/vscode/konductor,type=bind,consistency=cached",
