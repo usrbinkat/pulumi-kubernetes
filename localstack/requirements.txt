@@ -1,0 +1,4 @@
+pulumi>=3.0.0,<4.0.0
+pulumi-aws==6.0.4 #Must be pinned due to pulumi-eks hardcoded dependency
+pulumi-eks
+pulumi-kubernetes

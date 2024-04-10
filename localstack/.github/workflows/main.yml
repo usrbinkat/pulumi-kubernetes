@@ -1,0 +1,78 @@
+name: Pulumi EKS on LS
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+# Only one pull-request triggered run should be executed at a time
+# (head_ref is only set for PR events, otherwise fallback to run_id which differs for every run).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env: 
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
+      LOCALSTACK_AUTH_TOKEN: ${{ secrets.TEST_LOCALSTACK_AUTH_TOKEN }}
+      LOCALSTACK_VOLUME_DIR: /tmp
+
+    steps:
+    - name: Install tools
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --update
+        pip install awscli-local
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        curl -fsSL https://get.pulumi.com | sh
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Start localstack manually
+      env:
+        TAG: "latest"
+      run: |
+        pip install localstack
+        docker pull localstack/localstack-pro:${TAG}
+        docker run -d --rm \
+          -e DISABLE_EVENTS=1 \
+          -e DEBUG=1 \
+          -e LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN} \
+          -e LS_LOG=trace \
+          --name localstack_main \
+          -v "${LOCALSTACK_VOLUME_DIR}:/var/lib/localstack" \
+          -v "/var/run/docker.sock:/var/run/docker.sock" \
+          -p "127.0.0.1:4566:4566" \
+          -p "127.0.0.1:4510-4559:4510-4559" \
+          localstack/localstack-pro
+
+    - name: Run Pulumi
+      shell: bash
+      run: |
+        export PATH=$PATH:/root/.pulumi/bin
+        export PULUMI_BACKEND_URL=file://`pwd`
+        export PULUMI_CONFIG_PASSPHRASE=lsdevtest
+        pulumi stack init test
+        pulumi stack select test
+        pulumi up -y
+
+    - name: Setup context
+      shell: bash
+      run: |
+        export CLUSTER_NAME=$(awslocal eks list-clusters --region=us-east-1 | jq -r '.clusters[0]')
+        awslocal eks update-kubeconfig --name $CLUSTER_NAME && kubectl config use-context arn:aws:eks:us-east-1:000000000000:cluster/$CLUSTER_NAME
+    
+    - run: kubectl get all
+
+    - run: curl http://localhost:8081
