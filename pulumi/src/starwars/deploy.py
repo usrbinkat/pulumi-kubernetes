@@ -27,7 +27,7 @@ def deploy_starwars(ns: str, cilium_policy_strict: bool, k8s_provider: k8s.Provi
     )
 
     if cilium_policy_strict:
-        cilium_network_policy = k8s.apiextensions.CustomResource(
+        cilium_network_policy = k8s.apiextensions.CustomResource.CustomResource(
             "cilium_network_policy_deathstar",
             api_version="cilium.io/v2",
             kind="CiliumNetworkPolicy",

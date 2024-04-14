@@ -17,13 +17,15 @@ from starwars.deploy import deploy_starwars
 config = pulumi.Config()
 
 # Get the kubeconfig file path from priority order:
-# 1. Pulumi configuration value: `pulumi config set kubeconfig <path>`
-# 2. KUBECONFIG environment variable
-# 3. Default to ~/.kube/config
+#   1. Pulumi configuration value: `pulumi config set kubeconfig <path>`
+#   2. KUBECONFIG environment variable
+#   3. Default to ~/.kube/config
 kubernetes_config = config.get("kubeconfig") or os.getenv("KUBECONFIG") or "~/.kube/config"
-# Get the kubeconfig context from the Pulumi configuration
+
+# Get kubeconfig context from Pulumi config or default to "kind-pulumi"
 kubernetes_context = config.get("kubeconfig.context") or "kind-pulumi"
-# Get the Kubernetes distribution from the Pulumi configuration
+
+# Get the Kubernetes distribution from the Pulumi configuration or default to "kind"
 kubernetes_distribution = config.get("kubernetes_distribution") or "kind"
 
 # Create a Kubernetes provider instance
@@ -34,6 +36,7 @@ kubernetes_provider = k8s.Provider(
 )
 
 # Fetch the Kubernetes endpoint for "kubernetes"
+# This is necessary on Kind kubernetes to correctly set the Cilium CNI clusterIP
 k8s_endpoint = k8s.core.v1.Endpoints.get(
     "k8s-endpoint",
     "kubernetes",
@@ -113,6 +116,10 @@ if enable:
 else:
     kubevirt = (None)
 
+##################################################################################
+## Deploy Demo Apps
+##################################################################################
+
 # Demo Helm Chart "Jobs App"
 # Get pulumi config jobs_app.enable boolian
 # ~$ pulumi config set jobs_app.enable true
@@ -123,6 +130,8 @@ if enable:
         kubernetes_provider,
         cilium[1]
     )
+else:
+    jobs_app = None
 
 # If starwars.enable is true, deploy the Star Wars app
 # Enable the Star Wars app with the following command:
@@ -138,7 +147,8 @@ if starwars_enable:
         cilium_policy_strict,
         kubernetes_provider
     )
-
+else:
+    starwars = None
 
 ##################################################################################
 ## Export Stack Outputs
