@@ -120,7 +120,7 @@ if enabled:
     # If bool true, deploy the Jobs App Helm Chart
     jobs_app = deploy_jobs_app(
         kubernetes_provider,
-        cilium
+        cilium[1]
     )
 
 ##################################################################################
