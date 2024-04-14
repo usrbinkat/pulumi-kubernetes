@@ -10,6 +10,7 @@ from cilium.deploy import deploy_cilium
 from jobs_app.deploy import deploy_jobs_app
 from cert_manager.deploy import deploy_cert_manager
 from kubevirt.deploy import deploy_kubevirt
+from starwars.deploy import deploy_starwars
 
 ##################################################################################
 # Load the Pulumi Config
@@ -122,6 +123,22 @@ if enabled:
         kubernetes_provider,
         cilium[1]
     )
+
+# If starwars.enabled is true, deploy the Star Wars app
+# Enable the Star Wars app with the following command:
+#   ~$ pulumi config set starwars.enabled true
+# Set the Cilium Network Policy with the following command:
+#   ~$ pulumi config set cilium.strict true
+starwars_enabled = config.get_bool("starwars.enabled") or False
+cilium_policy_strict = config.get_bool("cilium.strict") or False
+namespace = "empire"
+if starwars_enabled:
+    starwars = deploy_starwars(
+        namespace,
+        cilium_policy_strict,
+        kubernetes_provider
+    )
+
 
 ##################################################################################
 ## Export Stack Outputs
