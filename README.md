@@ -2,9 +2,10 @@
 
 [![CI - Cilium on Kind](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml/badge.svg)](https://github.com/usrbinkat/cilium-kubernetes/actions/workflows/ci.yaml) [![License](https://img.shields.io/github/license/usrbinkat/iac-mesh-pac)]() [![Pulumi](https://img.shields.io/badge/pulumi-v3.101.1-blueviolet)](https://www.pulumi.com/docs/get-started/install/) [![Cilium](https://img.shields.io/badge/cilium-v1.14.5-blueviolet)](https://docs.cilium.io/en/v1.9/gettingstarted/kind/) [![kubectl](https://img.shields.io/badge/kubectl-v1.29.0-blueviolet)](https://kubernetes.io/docs/tasks/tools/install-kubectl/) [![Docker](https://img.shields.io/badge/docker-v24.0.7-blueviolet)](https://docs.docker.com/get-docker/) [![Kind](https://img.shields.io/badge/kind-v0.20.0-blueviolet)](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/usrbinkat/cilium-kubernetes)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/usrbinkat/pulumi-kubernetes?quickstart=1&devcontainer_path=.devcontainer%2Fdevcontainer.json)
 
 ## Index
+
 - [Infrastructure as Code](#infrastructure-as-code)
   - [Overview](#overview)
   - [How To](#how-to)
@@ -29,13 +30,13 @@ This repository contains a [Python] infrastructure as code (IaC) project that de
 - **[Kubevirt]**: KubeVirt is a virtualization add-on for Kubernetes that allows you to run virtual machines alongside your container workloads in Kubernetes.
 - **[Containerized Data Importer]**: The Containerized Data Importer (CDI) is a Kubernetes add-on that allows you to import and prepare VM images for use with KubeVirt.
 
-[Cilium]:https://cilium.io
-[Pulumi]:https://www.pulumi.com
-[Kind]:https://kind.sigs.k8s.io
-[Kubevirt]:https://kubevirt.io
-[Cert-Manager]:https://cert-manager.io
-[Containerized Data Importer]:https://kubevirt.io/user-guide/operations/containerized_data_importer
-[Python]:https://www.python.org
+[Cilium]: https://cilium.io
+[Pulumi]: https://www.pulumi.com
+[Kind]: https://kind.sigs.k8s.io
+[Kubevirt]: https://kubevirt.io
+[Cert-Manager]: https://cert-manager.io
+[Containerized Data Importer]: https://kubevirt.io/user-guide/operations/containerized_data_importer
+[Python]: https://www.python.org
 
 ### How To
 
@@ -80,6 +81,7 @@ make stop
 ```
 
 > After stopping the GH Codespace go to the GH Codespaces dashboard and delete the Codespace
+>
 > - https://github.com/codespaces
 
 ### Repo Tree
