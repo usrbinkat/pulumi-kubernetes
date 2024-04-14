@@ -50,15 +50,15 @@ kubernetes_endpoint = pulumi.Output.from_input(k8s_endpoint.subsets[0].addresses
 ##################################################################################
 
 # Cilium CNI
-# Check pulumi config 'cilium.enabled' and deploy if true
+# Check pulumi config 'cilium.enable' and deploy if true
 # Disable Cilium with the following command:
-#   ~$ pulumi config set cilium.enabled false
+#   ~$ pulumi config set cilium.enable false
 # Set Cilium version override with the following command:
 #   ~$ pulumi config set cilium.version v1.14.7
-enabled = config.get_bool('cilium.enabled') or True
+enable = config.get_bool('cilium.enable') or True
 version = config.get('cilium.version') or None
 namespace = "kube-system"
-if enabled:
+if enable:
     # Deploy Cilium
     cilium = deploy_cilium(
         namespace,
@@ -71,15 +71,15 @@ else:
     cilium = (None, None)
 
 # Cert Manager
-# Check pulumi config 'cert_manager.enabled' and deploy if true
+# Check pulumi config 'cert_manager.enable' and deploy if true
 # Enable cert-manager with the following command:
-#   ~$ pulumi config set cert_manager.enabled true
+#   ~$ pulumi config set cert_manager.enable true
 # Set cert-manager version override with the following command:
 #   ~$ pulumi config set cert_manager.version v1.5.3
-enabled = config.get_bool('cert_manager.enabled') or False
+enable = config.get_bool('cert_manager.enable') or False
 version = config.get('cert_manager.version') or None
 namespace = "cert-manager"
-if enabled:
+if enable:
     # Deploy cert-manager
     cert_manager = deploy_cert_manager(
         namespace,
@@ -91,16 +91,16 @@ else:
     cert_manager = (None, None)
 
 # Kubevirt
-# Check pulumi config 'kubevirt.enabled' and deploy if true
+# Check pulumi config 'kubevirt.enable' and deploy if true
 # Enable Kubevirt with the following command:
-#   ~$ pulumi config set kubevirt.enabled true
+#   ~$ pulumi config set kubevirt.enable true
 # Set Kubevirt version override with the following command:
 #   ~$ pulumi config set kubevirt.version v0.46.0
-enabled = config.get_bool('kubevirt.enabled') or False
+enable = config.get_bool('kubevirt.enable') or False
 version = config.get('kubevirt.version') or None
 namespace = "kubevirt"
 depends = cert_manager[1]
-if enabled:
+if enable:
     # Deploy KubeVirt
     kubevirt = deploy_kubevirt(
         namespace,
@@ -114,25 +114,25 @@ else:
     kubevirt = (None)
 
 # Demo Helm Chart "Jobs App"
-# Get pulumi config jobs_app.enabled boolian
-# ~$ pulumi config set jobs_app.enabled true
-enabled = config.get_bool('jobs_app.enabled') or False
-if enabled:
+# Get pulumi config jobs_app.enable boolian
+# ~$ pulumi config set jobs_app.enable true
+enable = config.get_bool('jobs_app.enable') or False
+if enable:
     # If bool true, deploy the Jobs App Helm Chart
     jobs_app = deploy_jobs_app(
         kubernetes_provider,
         cilium[1]
     )
 
-# If starwars.enabled is true, deploy the Star Wars app
+# If starwars.enable is true, deploy the Star Wars app
 # Enable the Star Wars app with the following command:
-#   ~$ pulumi config set starwars.enabled true
+#   ~$ pulumi config set starwars.enable true
 # Set the Cilium Network Policy with the following command:
 #   ~$ pulumi config set cilium.strict true
-starwars_enabled = config.get_bool("starwars.enabled") or False
+starwars_enable = config.get_bool("starwars.enable") or False
 cilium_policy_strict = config.get_bool("cilium.strict") or False
 namespace = "empire"
-if starwars_enabled:
+if starwars_enable:
     starwars = deploy_starwars(
         namespace,
         cilium_policy_strict,
