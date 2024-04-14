@@ -24,6 +24,7 @@ def deploy_starwars(
         )
     )
 
+    # Deploy the Star Wars application
     starwars_app = k8s.yaml.ConfigFile(
         "starwars",
         file="https://raw.githubusercontent.com/cilium/cilium/HEAD/examples/minikube/http-sw-app.yaml",
@@ -36,8 +37,7 @@ def deploy_starwars(
 
     # Check if the Cilium Network Policy is enabled and deploy if true
     if cilium_policy_strict:
-        # Create the CiliumNetworkPolicy using Pulumi
-        # TODO
+        # TODO fix err: module object is not callable
         # pulumi:pulumi:Stack (pulumi-kubernetes-kind):
         # error: Program failed with an unhandled exception:
         # Traceback (most recent call last):
