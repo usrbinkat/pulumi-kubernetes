@@ -1,6 +1,6 @@
 name: pulumi-kubernetes
 description: Tricks with Pulumi IaC demonstrated on Kubernetes
-main: pulumi/src/__main__.py
+main: pulumi/src
 stackConfigDir: pulumi/stacks
 options:
   refresh: always
