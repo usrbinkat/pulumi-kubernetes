@@ -1,7 +1,7 @@
 {
     "name": "konductor-localstack",
     "remoteUser": "vscode",
-    "dockerFile": "Dockerfile",
+    // "dockerFile": "Dockerfile",
     "init": true,
     "privileged": true,
     "overrideCommand": false,
@@ -11,19 +11,21 @@
     "securityOpt": [
         "seccomp=unconfined"
     ],
-    "runArgs": [
-        "--network=host",
-        "--device=/dev/kvm"
-    ],
-    "mounts": [
-        "source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
-    ],
+    // "runArgs": [
+    //     // "--network=host",
+    //     "--device=/dev/kvm"
+    // ],
+    // "mounts": [
+    //     "source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
+    // ],
     "features": {
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
     },
     "postCreateCommand": "devcontainer-links",
-    //"workspaceMount": "source=.,target=/home/vscode/konductor,type=bind,consistency=cached",
-    //"workspaceFolder": "/home/vscode/konductor",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "devcontainer",
+    // "workspaceMount": "source=.,target=/home/vscode/konductor,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/konductor",
     "forwardPorts": [
         1313,
         2222,

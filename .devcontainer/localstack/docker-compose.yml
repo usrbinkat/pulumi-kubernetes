@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  devcontainer:
+    container_name: devcontainer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/home/vscode/konductor:cached
+    command: sleep infinity
+    dns:
+      # Set the DNS server to be the LocalStack container
+      - 10.0.2.20
+    networks:
+      - ls
+
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack-pro # required for Pro
+    ports:
+      - "127.0.0.1:4566:4566" # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559" # external services port range
+      - "127.0.0.1:443:443" # LocalStack HTTPS Gateway (Pro)
+    environment:
+      # Activate LocalStack Pro: https://docs.localstack.cloud/getting-started/auth-token/
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?} # required for Pro
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - PERSISTENCE=${PERSISTENCE:-0}
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      ls:
+        # Set the container IP address in the 10.0.2.0/24 subnet
+        ipv4_address: 10.0.2.20
+
+networks:
+  ls:
+    ipam:
+      config:
+        # Specify the subnet range for IP address allocation
+        - subnet: 10.0.2.0/24
